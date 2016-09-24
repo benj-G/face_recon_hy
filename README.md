@@ -12,8 +12,8 @@ The website is up! It's still a very rough and near featureless version of our p
 4. Add this text to the file and save: 
 ```
 <VirtualHost *:80>
-    ServerName project1
-    DocumentRoot /var/www/html/project1
+    ServerName faceTracker
+    DocumentRoot /var/www/html/faceTracker
     ErrorLog ${APACHE_LOG_DIR}/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
 </VirtualHost>
