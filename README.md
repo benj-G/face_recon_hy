@@ -8,7 +8,7 @@ The website is up! It's still a very rough and near featureless version of our p
 ##### Instructions:
 1. Place the faceTracker folder into your '/var/www/html/' directory.
 2. Open a terminal and enter `sudo touch /etc/apache2/sites-available/faceTracker.conf`
-3. Open the file in an editor with `sudo touch /etc/apache2/sites-available/faceTracker.conf`
+3. Open the file in an editor with `sudo gedit /etc/apache2/sites-available/faceTracker.conf`
 4. Add this text to the file and save: 
 ```
 <VirtualHost *:80>
