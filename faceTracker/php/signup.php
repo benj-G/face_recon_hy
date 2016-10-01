@@ -37,7 +37,7 @@
             // Display errors or redirect to user account page
             if(is_unique_user($email)) {
                 // Store login 
-                store_data($email, $pword, $fname, $lname);
+                store_data($email, $pword, $fname, $lname, $_SERVER['REMOTE_ADDR']);
                 // Note: Create a session here
                 header("Location: ../account.html");
             } else {
