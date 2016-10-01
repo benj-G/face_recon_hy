@@ -40,10 +40,16 @@
 
     // Creating a new record in database
     function store_data($email, $pword, $fname, $lname, $ipaddr) {
-        $query = "INSERT INTO user_profiles (user_name, password, first_name, last_name, last_login, last_ipaddr) VALUES ('$email', '$pword', '$fname', '$lname', 'now', '$ipaddr')";
+        $query = "INSERT INTO user_profiles(user_name, user_password, first_name, last_name, last_login, last_ipaddr) VALUES ('$email', '$pword', '$fname', '$lname', 'now', '$ipaddr')";
         
         $dbConn = pgConnect();
-        pgQuery($dbConn, $query);
+        $result = pgQuery($dbConn, $query);
+        if(!$result){
+            $p_error = pg_last_error($dbConn);
+            echo($p_error);
+            die();
+        }
+
         pgDisconnect($dbConn);
         
         // Note: Can check for error cases eventually
