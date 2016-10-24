@@ -417,13 +417,29 @@ img::-moz-selection {
     background: 0 0;
 }
 
+input{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+}
+
 input::-moz-selection {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
     text-shadow: none;
     color: whitesmoke;
     background: #797A79;
 }
 
 input::selection {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
     text-shadow: none;
     color: whitesmoke;
     background: #797A79;
