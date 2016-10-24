@@ -3,18 +3,25 @@
  * Code licensed under the Apache License v2.0.
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
+head{
+    width: 100%;
+    height: 100%;
+    font-family: Lora,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #575757;
+}
 
 body {
     width: 100%;
     height: 100%;
     font-family: Lora,"Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #fff;
-    background-color: #000;
+    background-color: #575757;
 }
 
 html {
     width: 100%;
     height: 100%;
+    background-color: #575757;
 }
 
 h1,
@@ -28,12 +35,14 @@ h6 {
     font-family: Montserrat,"Helvetica Neue",Helvetica,Arial,sans-serif;
     font-weight: 700;
     letter-spacing: 1px;
+    background-color: transparent;
 }
 
 p {
     margin: 0 0 25px;
     font-size: 18px;
     line-height: 1.5;
+    background-color: transparent;
 }
 
 @media(min-width:768px) {
@@ -203,7 +212,7 @@ img {
     text-align: center;
     color: #fff;
     background: url(../img/ph.jpg) no-repeat bottom center scroll;
-    background-color: #000;
+    background-color: #575757;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover;
@@ -329,7 +338,7 @@ img {
 .btn-default {
     border: 1px solid #FFF;
     color: #FFF;
-    background-color: transparent;
+    background-color: #0d0d0d;
 }
 
 .btn-default:hover,
