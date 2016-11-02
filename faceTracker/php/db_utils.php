@@ -2,13 +2,13 @@
 
     function verify_login_info($email, $pword) {   
         $verified = false;
-        $query = "SELECT * FROM user_profiles WHERE user_name = '$email'";
+        $query = "SELECT * FROM user_profiles WHERE user_name = '$email'"; // injection can be placed here?
         
         $dbConn = pgConnect();
         
         $result = pgQuery($dbConn, $query);
         while($row = pgFetchAssoc($result)) {
-            if($row['user_name'] === $email && $row['password'] === $pword) {
+            if($row['user_name'] === $email && $row['user_password'] === $pword) {
                 $verified = true;
                 break;
             }
