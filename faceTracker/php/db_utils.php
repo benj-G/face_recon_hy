@@ -21,12 +21,8 @@
 
     // Verify user login info
     function verify_login_info($email, $pword) {
-        $verified = false;
-<<<<<<< HEAD
-        $query = "SELECT * FROM user_profiles WHERE user_name = '$email'"; // injection can be placed here?
-=======
+        $verified = false;        
         $query = "SELECT * FROM hellyeah.user_profiles WHERE user_name = '$email'";
->>>>>>> php_dev
         
         // Connecting to db
         $dbConn = pgConnect();
