@@ -2,7 +2,6 @@
 
     $dir = "../data/vid/";
     $filename = $dir . basename($_FILES["file"]["name"]);
-
     // If submit value is set, validate file type and extract file info
     if(isset($_POST["submit"])) {
         // Check file type with ffprobe
@@ -12,6 +11,10 @@
     // Reject the upload if file size is > 10MB
     if($_FILES["file"]["size"] > 100000000) {
         echo("Please upload a smaller file (< 10MB).");
+    }
+
+    if (!is_writeable($dir . $_FILES['file']['name'])) {
+       die("Cannot write to destination file");
     }
 
     // Check if name already in use

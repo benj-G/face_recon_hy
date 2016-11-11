@@ -1,6 +1,7 @@
 <?php
 
-    // Note: If time permits, we can thread this module so multiple connections are possible
+    // Note: If time permits, we can thread this module 
+    //       so multiple connections are possible
     //       Just need to watch out for race conditions
 
     // Open a connection with specified Postgres db
@@ -8,7 +9,7 @@
         // Temp hardcoded connection info
         $host = "host=127.0.0.1";
         $port = "port=5432";
-        $dbname = "dbname=login_test";
+        $dbname = "dbname=teamhellyeah";
         $cred = "user=postgres password=postgres";
         
         // Note: Pass PGSQL_CONNECT_FORCE_NEW if multiple connections desired

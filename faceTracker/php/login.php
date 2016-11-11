@@ -1,13 +1,18 @@
 <?php
 
     include "post_utils.php";
-    include "db_man.php";
     include "db_utils.php";
+    include "session_utils.php";
+    include "account.php";
+
+    ///////////
+    // Script
+    ////////
 
     $email = $pword = "";
     $errors = false;
 
-    if($_SERVER["REQUEST_METHOD"] == "POST") {
+    if(isset($_POST["submit"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Validating email format
         $email = clean_post($_POST["email"]);
@@ -23,18 +28,22 @@
 
         // Display error or redirect to user account page
         if(verify_login_info($email, $pword)) {
-            // Note: Create a session here
-          header("Location: ../account.html");
+            // Creating new client session
+            create_session($email);
+            
+            // Serving user account page
+            display_account_page();
         } else {
-            // Send errors to client
             echo("Incorrect user and/or password information.");
-            // header("Location: ../login.html");
         }
 
     } else {
-        // Serve form submission error page
+        // Redirect to form submission error page
         header("Location: ../login.html");
         // error: "Submission failed. Please try again."
     }
+
+    // Exit script
+    exit();
 
 ?>
