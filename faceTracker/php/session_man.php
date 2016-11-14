@@ -24,8 +24,8 @@
         $_SESSION['ipaddr'] = filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP);
 
         // insert information into sessions and session_lookup table
-        $query1 = "INSERT INTO session_lookup(session_id, user_name) VALUES ('".$_SESSION['sId']."', '".$_SESSION['user_name']."')"; // sanitize?
-        $query2 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
+        $query2 = "INSERT INTO session_lookup(session_id, user_name) VALUES ('".$_SESSION['sId']."', '".$_SESSION['user_name']."')"; // sanitize?
+        $query1 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
 
         $dbConn = pgConnect();
         pgQuery($dbConn, $query1);
@@ -44,14 +44,18 @@
         // Storing user specific info
         $userInfo = get_user_info($email);
         $name = $userInfo['user_name'];
-        $time = $userInfo['session_time'];
+        //$time = 
         $current_time = time();
 
         // Delete session if session has expired. Over 30 minutes.
-        if(($current_time - $time) > 1800){
-            end_session();
-            $query = "DELETE FROM SESSIONS WHERE SESSION_ID = (SELECT SESSION_ID FROM SESSION_LOOKUP WHERE USER_NAME = '$name')";
-        }
+        //if(($current_time - $time) > 1){ // change to 1800
+            //end_session();
+            $query = "DELETE FROM SESSIONS WHERE SESSION_ID = (SELECT SESSION_ID FROM SESSION_LOOKUP WHERE USER_NAME = '$name') AND now() > (SESSION_TIME + '30 MINUTES')"; // deal when session lookup table has more than 1 use name
+            $dbConn = pgConnect();
+            $results = pg_query($dbConn, $query);
+            pgDisconnect($dbConn);
+            //die(var_dump(pg_fetch_all($results)));
+        //}
         $_SESSION['first_name'] = $userInfo['first_name'];
         $_SESSION['last_name'] = $userInfo['last_name'];
         $_SESSION['user_name'] = $email;
