@@ -16,12 +16,12 @@
         //die("no cookie");
     }
     else{
-        $cookie_sId = $_COOKIE['c_sId'];
-        if(check_existing_session($cookie_sId)){
+    $cookie_sId = clean_post($_COOKIE['c_sId']);
+    if(check_existing_session($cookie_sId)){
             log_in_from_session($cookie_sId);
             display_account_page();
             exit();
-        }
+    }
         // log in user if cookie session id matches one and so does the ip address in the database
     }
     if(isset($_POST["submit"]) && $_SERVER["REQUEST_METHOD"] == "POST") {

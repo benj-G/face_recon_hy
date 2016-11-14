@@ -33,7 +33,22 @@
 
         $tuple = pg_fetch_assoc($results);
         if(count($tuple) == 0) return $valid_session;
-        if($tuple['session_id'] == $cookie_containing_session && $tuple['ipaddr']==$_SERVER['REMOTE_ADDR']) $valid_session = true; // if false delete session?                                                                         
+        if($tuple['session_id'] == $cookie_containing_session && $tuple['ipaddr']==$_SERVER['REMOTE_ADDR']) $valid_session = true; // if false delete session?
+        // Could potentially delete session on server if that's more secure
+        else{
+            end_session();
+            //courtest of http://stackoverflow.com/questions/686155/remove-a-cookie
+            if (isset($_COOKIE['c_sId'])) {
+                unset($_COOKIE['c_sId']);
+               setcookie('c_sId', '', time() - 3600, '/'); // empty value and old timestamp
+               // die("in loop");
+            }
+            if (isset($_COOKIE['PHPSESSID'])) {
+                unset($_COOKIE['PHPSESSID']);
+               setcookie('PHPSESSID', '', time() - 3600, '/'); // empty value and old timestamp
+               // die("in loop");
+            } 
+        }                                                                        
         pgDisconnect($dbConn);
 
         return $valid_session;
@@ -44,7 +59,7 @@
         $query = ("SELECT * FROM sessions WHERE session_id='$cookie_containing_session'");
         $results = pgQuery($dbConn, $query);
         $tuple = pg_fetch_assoc($results);
-        if(count($tuple) == 0) return;
+        if(count($tuple) == 0) return; //remove cookies?
         else $session_id = $tuple['session_id'];
         $query = ("SELECT user_name from session_lookup WHERE session_id='$session_id'");
         $results = pgQuery($dbConn, $query);
