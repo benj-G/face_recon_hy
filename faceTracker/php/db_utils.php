@@ -1,7 +1,7 @@
 <?php
 
     include "db_man.php";
-
+    include "security.php";
     // Verify user account name is unique id
     function is_unique_user($email) {
         $unique = false;
@@ -23,14 +23,16 @@
     function verify_login_info($email, $pword) {
         $verified = false;        
         $query = "SELECT * FROM user_profiles WHERE user_name = '$email'";
-        
+        $hash;// get the hash
+        $salt;//get salt from table
         // Connecting to db
         $dbConn = pgConnect();
-        
         // Checking for existing user account with same email
         $result = pgQuery($dbConn, $query);
         while($row = pgFetchAssoc($result)) {
-            if($row['user_name'] === $email && $row['user_password'] === $pword) {
+            $salt = $row['salt'];
+            $hash = get_hash($pword, $salt);
+            if($row['user_name'] === $email && $row['user_password'] === $hash) {
                 $verified = true;
                 break;
             }
