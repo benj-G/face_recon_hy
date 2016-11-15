@@ -4,7 +4,6 @@
     include "db_utils.php";
     include "session_utils.php";
     include "account.php";
-
     ///////////
     // Script
     ////////
@@ -38,12 +37,11 @@
 
         // Note: Not working, gives ""
         $ipaddr = filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP);
-        
         // Display errors or redirect to user account page
         if(is_unique_user($email)) {
             // Storing login info
             store_data($email, $pword, $fname, $lname, $ipaddr);
-            
+            save_pass($email, $pword);
             // Creating new client session
             create_session($email);
             
@@ -55,8 +53,8 @@
 
     } else {
         // Redirect to form submission error page
-        echo(var_dump($_POST));
-        //header("Location: ../signup.html");
+        //echo(var_dump($_POST));
+        header("Location: ../signup.html");
         // error: "Submission failed. Please try again."
     }
 
