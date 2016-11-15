@@ -35,8 +35,10 @@
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
                     <i class="fa fa-bars"></i>
                 </button>
-                <a class="navbar-brand page-scroll" href="../index.html">
-                    <i class="fa fa-play-circle"></i>  <span class="light">Logout</span>
+                <a class="navbar-brand page-scroll">
+                <form id="submitForm" action="../php/logout.php" method="POST">
+                        <input id="submitBtn" class="btn btn-default btn-lg" type="submit" value="Logout" />
+                </form>
                 </a>
             </div>
         </div>

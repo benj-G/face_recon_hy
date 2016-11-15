@@ -11,7 +11,19 @@
 
     $email = $pword = "";
     $errors = false;
-
+    // check fo sessions and time
+    if(!isset($_COOKIE['c_sId'])){
+        //die("no cookie");
+    }
+    else{
+    $cookie_sId = clean_post($_COOKIE['c_sId']);
+    if(check_existing_session($cookie_sId)){
+            log_in_from_session($cookie_sId);
+            display_account_page();
+            exit();
+    }
+        // log in user if cookie session id matches one and so does the ip address in the database
+    }
     if(isset($_POST["submit"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Validating email format

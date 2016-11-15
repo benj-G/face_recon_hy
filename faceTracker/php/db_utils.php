@@ -5,7 +5,7 @@
     // Verify user account name is unique id
     function is_unique_user($email) {
         $unique = false;
-        $query = "SELECT * FROM hellyeah.user_profiles WHERE user_name = '$email'";
+        $query = "SELECT * FROM user_profiles WHERE user_name = '$email'";
         
         $dbConn = pgConnect();
         
@@ -22,7 +22,7 @@
     // Verify user login info
     function verify_login_info($email, $pword) {
         $verified = false;        
-        $query = "SELECT * FROM hellyeah.user_profiles WHERE user_name = '$email'";
+        $query = "SELECT * FROM user_profiles WHERE user_name = '$email'";
         
         // Connecting to db
         $dbConn = pgConnect();
@@ -44,7 +44,7 @@
 
     // Create new record in database
     function store_data($email, $pword, $fname, $lname, $ipaddr) {
-        $query = "INSERT INTO hellyeah.user_profiles (user_name, user_password, first_name, last_name, last_login, last_ipaddr) VALUES ('$email', '$pword', '$fname', '$lname', 'now', '$ipaddr')";
+        $query = "INSERT INTO user_profiles (user_name, user_password, first_name, last_name, last_login, last_ipaddr) VALUES ('$email', '$pword', '$fname', '$lname', 'now', '$ipaddr')";
         
         $dbConn = pgConnect();
         pgQuery($dbConn, $query);
@@ -56,7 +56,7 @@
 
     // Returns all user facing data except password in an associative array
     function get_user_info($email) {
-        $query = "SELECT user_name, first_name, last_name FROM hellyeah.user_profiles where user_name = '$email'";
+        $query = "SELECT user_name, first_name, last_name FROM user_profiles where user_name = '$email'";
         
         $dbConn = pgConnect();
         $results = pgQuery($dbConn, $query);
@@ -67,7 +67,7 @@
 
     // Returns associative array containing user_password
     function get_password($email) {
-        $query = "SELECT user_password FROM hellyeah.user_profiles where user_name = '$email'";
+        $query = "SELECT user_password FROM user_profiles where user_name = '$email'";
             
         $dbConn = pgConnect();
         $results = pgQuery($dbConn, $query);
@@ -78,7 +78,7 @@
 
     // Returns an associative array containing last_login and last_ipaddr
     function get_login_info($email) {
-        $query = "SELECT last_login, last_ipaddr FROM hellyeah.user_profiles where user_name = '$email'";
+        $query = "SELECT last_login, last_ipaddr FROM user_profiles where user_name = '$email'";
             
         $dbConn = pgConnect();
         $results = pgQuery($dbConn, $query);

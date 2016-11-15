@@ -1,6 +1,12 @@
 <!DOCTYPE html>
+<?php
+if(isset($_COOKIE['c_sId'])){
+    header("Location: ./php/login.php");
+    exit();
+            }
+//else die("no cookies");
+?>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +14,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>CS160 - Signup Form</title>
+    <title>CS160 - Login Form</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -25,23 +31,24 @@
 
     <!-- Importing jQuery and Javascript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-
+    
 </head>
 
 <body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
     <div class = container>
         <a href="index.html" class="btn btn-default btn-lg" >Back</a></li>
     </div>
+
     <!-- Intro Header -->
     <header class="facetracking-intro">
         <div class="intro-body">
             <div class="container">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
-                        <h1 class="brand-heading">User Signup</h1>
-                        <p class="intro-text">Enter your information below.</p>
-                    
-                        <form action="./php/signup.php" method="POST">
+                        <h1 class="brand-heading">User Login</h1>
+                        <p class="intro-text"></p>
+                        <p id="errors"></p>
+                        <form id="submitForm" action="./php/login.php" method="POST">
                             <table class="login-form">
                                 <tr>
                                     <td><input class="input-field" type="email" name="email" placeholder="Email" /></td>
@@ -49,21 +56,15 @@
                                 <tr>
                                     <td><input class="input-field" type="password" name="pword" placeholder="Password" /></td>
                                 </tr>
-                                <tr>
-                                    <td><input class="input-field" type="text" name="fname" placeholder="First Name" /></td>
-                                </tr>
-                                <tr>
-                                    <td><input class="input-field" type="text" name="lname" placeholder="Last Name" /></td>
-                                </tr>
                             </table>
-                                <input id="submitBtn" class="btn btn-default btn-lg" type="submit" name="submit" value="Signup" /> <!--change name to submit->
+                                <input id="submitBtn" class="btn btn-default btn-lg" type="submit" name="submit" value="Login" />
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </header>
-
+        
     <hr />
 
     <!-- Footer -->
