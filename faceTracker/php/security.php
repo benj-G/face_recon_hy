@@ -8,7 +8,8 @@
 		$inphash;
 		exec ("cd ../bin/ && openssl rand -base64 6", $salt_result); //need to store this salt with the user?
 		$salt = $salt_result[0];
-		exec ("cd ../bin/ && openssl passwd -6 -salt $salt $passwd", $phash, $result);
+		exec ("cd ../bin/ && openssl passwd -1 -salt $salt $passwd", $phash, $result);
+		//	die(var_dump($phash));
 		$inphash = substr($phash[0], 9, strlen($phash[0]) - 1);
 		//die(var_dump($inphash));
 		//exec ('cd ../bin/ && openssl');
@@ -21,7 +22,7 @@
 
 	function get_hash($word, $salt){
 		$phash; $result;
-		exec ("cd ../bin/ && openssl passwd -6 -salt $salt $word", $phash, $result);
+		exec ("cd ../bin/ && openssl passwd -1 -salt $salt $word", $phash, $result);
 		$inphash = substr($phash[0], 9, strlen($phash[0]) - 1);
 		return $inphash;
 	}
