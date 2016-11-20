@@ -22,3 +22,8 @@ The website is up! It's still a very rough and near featureless version of our p
 6. Restart the Apache service: `sudo service apache2 restart`
 7. Now add the project to your hosts file: go to `sudo gedit /etc/hosts` and add the line `127.0.0.1 faceTracker`
 8. Go to http://faceTracker or localhost/faceTracker and you should see the landing page!
+
+### Setting up openssl
+1. Go to https://app.box.com/s/4t01n742w1afxne2ywk2gmo1t3etgarl
+2. Pick the right folder for your operating system
+3. Copy the bin folder to you where your other folders in var/www/html/faceTracker (This is temporary I believe there is a designated place on servers for executables)
