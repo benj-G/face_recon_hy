@@ -10,7 +10,7 @@
 		$salt = $salt_result[0];
 		exec ("cd ../bin/ && openssl passwd -1 -salt $salt $passwd", $phash, $result);
 		//	die(var_dump($phash));
-		$inphash = substr($phash[0], 9, strlen($phash[0]) - 1);
+		$inphash = substr($phash[3], 12, strlen($phash[0]) - 1);
 		//die(var_dump($inphash));
 		//exec ('cd ../bin/ && openssl');
 		$query = "UPDATE USER_PROFILES SET USER_PASSWORD='$inphash' WHERE USER_NAME='$usrname'; UPDATE USER_PROFILES SET SALT='$salt' WHERE USER_NAME='$usrname'";
@@ -23,7 +23,7 @@
 	function get_hash($word, $salt){
 		$phash; $result;
 		exec ("cd ../bin/ && openssl passwd -1 -salt $salt $word", $phash, $result);
-		$inphash = substr($phash[0], 9, strlen($phash[0]) - 1);
+		$inphash = substr($phash[3], 12, strlen($phash[0]) - 1);
 		return $inphash;
 	}
 ?>
