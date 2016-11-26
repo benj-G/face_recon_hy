@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>CS160 - Account Page</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="../css/grayscale.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+ 
+    <!-- Navigation -->
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand page-scroll">
+                <form id="submitForm" action="../php/logout.php" method="POST">
+                        <input id="submitBtn" class="btn btn-default btn-lg" type="submit" value="Logout" />
+                </form>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Intro Header -->
+    <header class="facetracking-intro">
+        <div class="intro-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h1 class="brand-heading">$HEADER_TEXT</h1>
+                        <p class="intro-text">$INTRO_TEXT</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- User Info Section -->
+    <section id="facetracking" class="container content-section text-center">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2">
+                <p>Upload a video:</p>
+                <p id="errors"></p>
+                <form id="submitForm" action="../php/upload.php" method="POST" enctype="multipart/form-data">
+                    <table class="upload-form">
+                        <tr>
+                            <td><input class="input-field" type="file" name="file" /></td>
+                        </tr>
+                    </table>
+                        <input id="submitBtn" class="btn btn-default btn-lg" type="submit" value="Upload" />
+                </form>
+                <div class="video">
+                    $USER_VIDEOS
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <hr />
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p>Copyright &copy; Team Hell Yeah</p>
+            <p>based on Start Bootstrap - Grayscale</p>
+        </div>
+    </footer>
+</body>
+
+</html>
