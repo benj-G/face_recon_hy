@@ -59,7 +59,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-#include "/usr/include/postgresql/libpq-fe.h"
+#include "libpq-fe.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -100,7 +100,7 @@ int main(void)
   char keyName[9] = "";
   char keyValue[9] = "";
   long videoID = -1;
-  long sessionID = -1;
+  char* sessionID = calloc(256, sizeof(char));
   const char *VIDEOID = "VIDEOID=";
   const char *SESSIONID = "SESSIONID=";
   const char *DETAILS = "DETAILS=";
@@ -108,8 +108,10 @@ int main(void)
   printf("%s%c%c\n", "Content-Type:text/html;charset=iso-8859-1",13,10);
   printf("<TITLE>Response</TITLE>\n");
   lenstr = getenv("CONTENT_LENGTH"); // CONTENT_LENGTH env var has length of input
-  if(lenstr == NULL || sscanf(lenstr,"%ld",&len)!=1 || len > MAXLEN)
-    printf("<P>System Error - incorrect invocation - wrong FORM probably.");
+  if(lenstr == NULL || sscanf(lenstr,"%ld",&len)!=1 || len > MAXLEN){
+    printf("<P>System Error - incorrect invocation - wrong FORM probably. - 1");
+    return 1;
+  }
   else 
   {
     fgets(input, len+1, stdin);
@@ -120,8 +122,10 @@ int main(void)
     const char kvDelim[2] = "&";
     const char kvAssignOp[2] = "=";
     token = strtok(input, kvDelim);
-    if(token == NULL)
-      printf("<p>System Error - Incorrect invocation - wrong FORM probably.");
+    if(token == NULL){
+      printf("<p>System Error - Incorrect invocation - wrong FORM probably. - 2");
+      return 2;
+    }
     else
     {
       while(token != NULL)
@@ -139,8 +143,8 @@ int main(void)
           keyName[strlen(SESSIONID)] = '\0';
           if(strcmp(keyName, SESSIONID) == 0) 
           {
-            sprintf(keyValue, "%.*s", (int)(strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
-            sessionID = strtol(keyValue, NULL, 10);
+            sprintf(keyValue, "%.*s", (strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
+            memcpy(sessionID, keyValue, strlen(keyValue));
           }
           else
           {
@@ -158,17 +162,18 @@ int main(void)
       }
       if(showDetails) 
       {
-        printf("<p>Video ID: %d<br>", (int)videoID);
-        printf("<p>Session ID: %d<br>", (int)sessionID);
+        printf("<p>Video ID: %d<br>", (int) videoID);
+        printf("<p>Session ID: %s<br>", sessionID);
       }
       // TODO: validate session id
       
       // process video by video ID
       if(processVideo(videoID) != 0)
         printf("<p>Could not process video<BR>");
+        return 3;
     }
   }
-  return 0;
+  exit(0);
 }
 
 int processVideo(long in_videoID)
@@ -191,7 +196,7 @@ int processVideo(long in_videoID)
   db_connection = PQconnectdb("host = 'localhost' dbname = 'pipedream' user = 'piper' password = 'letm3in'");
   if(PQstatus(db_connection) != CONNECTION_OK)
   {
-    printf("<P>System error. Please contact customer support.<BR>");
+    printf("<P>System error. Please contact customer support -db.<BR>");
     PQfinish(db_connection);
     exit(EXIT_FAILURE);
   }
