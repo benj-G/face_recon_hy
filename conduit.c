@@ -281,6 +281,7 @@ int processVideo(long in_videoID)
     int frameWidth = -1;
     float fps = -1.0;
     int numFrames = -1;
+    char * ech; // error location
     
     snprintf(ffCommand, MAX_COMMAND_LINE, "%s %s", "ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=height,width,avg_frame_rate,nb_read_frames -of default=noprint_wrappers=1:nokey=1", video_filename);
 
@@ -319,6 +320,11 @@ int processVideo(long in_videoID)
         default :
           printf("<p>System error. Please contact customer support.<BR>");
       }
+    }
+    if(entryCount == 0)
+    {
+      printf("<p>Uploaded video file could not be processed, video format not detected.<BR>");
+      exit(EXIT_FAILURE);
     }
 //    printf("<p> width is %d, height is %d, fps = %f, #frames is %d<BR>", frameWidth, frameHeight, fps, numFrames);
     // write metadata to the database
