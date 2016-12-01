@@ -59,7 +59,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-#include <errno.h>
 #include "libpq-fe.h"
 
 #define TRUE 1
@@ -101,7 +100,7 @@ int main(void)
   char keyName[9] = "";
   char keyValue[9] = "";
   long videoID = -1;
-  char* sessionID = calloc(256, sizeof(char));
+  long sessionID = -1;
   const char *VIDEOID = "VIDEOID=";
   const char *SESSIONID = "SESSIONID=";
   const char *DETAILS = "DETAILS=";
@@ -109,10 +108,8 @@ int main(void)
   printf("%s%c%c\n", "Content-Type:text/html;charset=iso-8859-1",13,10);
   printf("<TITLE>Response</TITLE>\n");
   lenstr = getenv("CONTENT_LENGTH"); // CONTENT_LENGTH env var has length of input
-  if(lenstr == NULL || sscanf(lenstr,"%ld",&len)!=1 || len > MAXLEN){
-    printf("<P>System Error - incorrect invocation - wrong FORM probably. - 1");
-    return 1;
-  }
+  if(lenstr == NULL || sscanf(lenstr,"%ld",&len)!=1 || len > MAXLEN)
+    printf("<P>System Error - incorrect invocation - wrong FORM probably.");
   else 
   {
     fgets(input, len+1, stdin);
@@ -123,10 +120,8 @@ int main(void)
     const char kvDelim[2] = "&";
     const char kvAssignOp[2] = "=";
     token = strtok(input, kvDelim);
-    if(token == NULL){
-      printf("<p>System Error - Incorrect invocation - wrong FORM probably. - 2");
-      return 2;
-    }
+    if(token == NULL)
+      printf("<p>System Error - Incorrect invocation - wrong FORM probably.");
     else
     {
       while(token != NULL)
@@ -144,8 +139,8 @@ int main(void)
           keyName[strlen(SESSIONID)] = '\0';
           if(strcmp(keyName, SESSIONID) == 0) 
           {
-            sprintf(keyValue, "%.*s", (strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
-            memcpy(sessionID, keyValue, strlen(keyValue));
+            sprintf(keyValue, "%.*s", (int)(strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
+            sessionID = strtol(keyValue, NULL, 10);
           }
           else
           {
@@ -163,18 +158,17 @@ int main(void)
       }
       if(showDetails) 
       {
-        printf("<p>Video ID: %d<br>", (int) videoID);
-        printf("<p>Session ID: %s<br>", sessionID);
+        printf("<p>Video ID: %d<br>", (int)videoID);
+        printf("<p>Session ID: %d<br>", (int)sessionID);
       }
       // TODO: validate session id
       
       // process video by video ID
       if(processVideo(videoID) != 0)
         printf("<p>Could not process video<BR>");
-        return 3;
     }
   }
-  exit(0);
+  return 0;
 }
 
 int processVideo(long in_videoID)
@@ -197,7 +191,7 @@ int processVideo(long in_videoID)
   db_connection = PQconnectdb("host = 'localhost' dbname = 'pipedream' user = 'piper' password = 'letm3in'");
   if(PQstatus(db_connection) != CONNECTION_OK)
   {
-    printf("<P>System error. Please contact customer support -db.<BR>");
+    printf("<P>System error. Please contact customer support.<BR>");
     PQfinish(db_connection);
     exit(EXIT_FAILURE);
   }
@@ -309,7 +303,7 @@ int processVideo(long in_videoID)
     strncat(img_subdir, base_dir, 1024); 
     strncat(img_subdir, "/", 1);
     strncat(img_subdir, video_ID, MAX_VIDEO_ID_LENGTH);
-    printf("<p>image subdirectory is %s<BR>", img_subdir);
+    printf("<p>mage subdirectory is %s<BR>", img_subdir);
     if(stat(&img_subdir[0], &file_stat) == 0)
     {
       dir_exists = TRUE;
@@ -317,9 +311,8 @@ int processVideo(long in_videoID)
     }
     else
     {
-
-
-    if(mkdir(img_subdir, 0755) == 0){
+      if(mkdir(img_subdir, 0755) == 0)
+      {
         dir_exists = TRUE;
         printf("<p>mkdir() used to create image subdirectory<BR>");
       }
@@ -327,8 +320,7 @@ int processVideo(long in_videoID)
       {
         printf("<p>mkdir() failed creating %s\n", img_subdir);
         printf("<p>System error. Please contact customer support.<BR>");
-        printf("%s"), strerror(errno);
-       // exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
       }
     }
     // extract the video frames to still images in the created subdirectory
@@ -348,25 +340,24 @@ int processVideo(long in_videoID)
       exit(EXIT_FAILURE);
     }
 
+
+    //Stitch together video files
+    snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%d.%%d.png -c:v libx264 %s/%d.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
+    fp = popen(ffCommand, "r");
+    if(fp == NULL)
+      {
+        printf("<p>System error. Please contact customer support.<BR>");
+        exit(EXIT_FAILURE);
+      }
+      status = pclose(fp);
+      if(status == -1)
+      {
+        printf("<p>System error. Please contact customer support<BR>");
+        exit(EXIT_FAILURE);
+      }
   }
   PQclear(db_result);
   PQfinish (db_connection);
-
-  //Stitch together video files
-  snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%d.%%d.png -c:v libx264 %s/%d.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
-  fp = popen(ffCommand, "r");
-  if(fp == NULL)
-    {
-      printf("<p>System error. Please contact customer support.<BR>");
-      exit(EXIT_FAILURE);
-    }
-    status = pclose(fp);
-    if(status == -1)
-    {
-      printf("<p>System error. Please contact customer support<BR>");
-      exit(EXIT_FAILURE);
-    }
-
   return 0;
 }
 
