@@ -2,8 +2,10 @@
     include "session_utils.php";
     include "db_utils.php";
     include "post_utils.php";
-
-    $dir = "../../data/vid/";
+    //linux
+    //$dir = "var/www/html/data/vid"; //absolute path to directory
+    //windows
+    $dir = "E:/xampp/htdocs/data/vid/";
     $filename = $dir . basename($_FILES["file"]["name"]);
     if(isset($_COOKIE['c_sId'])){
      $cookie_sId = clean_post($_COOKIE['c_sId']);
@@ -17,6 +19,27 @@
     //if(isset($_POST["submit"])) {
     //
     //  add check for bad filename
+
+        //return;
+        // Check file type with ffprobe
+        // If file is valid, store file info
+    //}
+
+    // Reject the upload if file size is > 10MB
+    if($_FILES["file"]["size"] > 100000000) {
+        die("Please upload a smaller file (< 10MB).");
+    }
+
+    if (!is_writeable($dir)) {
+        mkdir("../../data");
+        mkdir("../../data/vid");
+    }
+
+    // Check if name already in use
+    check_filename_duplicity($filename); 
+    // Attempt to upload file and echo success or failure
+    if(move_uploaded_file($_FILES["file"]["tmp_name"], $filename)) {
+        echo("Your file was uploaded successfully!");
         $dbConn = pgConnect();
         $query = "SELECT USER_ID FROM USER_PROFILES WHERE USER_NAME='$user_name'";
         $results =  pgQuery($dbConn, $query);
@@ -35,27 +58,6 @@
             $vID = $tuple['video_id'];
         }
         pgDisconnect($dbConn);
-        //return;
-        // Check file type with ffprobe
-        // If file is valid, store file info
-    //}
-
-    // Reject the upload if file size is > 10MB
-    if($_FILES["file"]["size"] > 100000000) {
-        die("Please upload a smaller file (< 10MB).");
-    }
-
-    if (!is_writeable($dir)) {
-        mkdir("../../data");
-        mkdir("../../data/vid");
-      // if (!is_writeable($dir . $_FILES['file']['name'])) die("Cannot write to destination file");
-    }
-    //rename("../data/vid/test.txt", "../data/vid/tmp.txt");
-    // Check if name already in use
-    check_filename_duplicity($filename); 
-    // Attempt to upload file and echo success or failure
-    if(move_uploaded_file($_FILES["file"]["tmp_name"], $filename)) {
-        echo("Your file was uploaded successfully!");
         make_cgi_post($cookie_sId, $vID);
     } else {
         echo("There was an error uploading your file. Please verify the file type and try again.");
@@ -75,7 +77,7 @@
     }
 
     function make_cgi_post($session_id, $video_id){
-        $dest = "http://localhost/faceTracker/php/conduit.cgi";
+        $dest = "http://localhost/cgi-bin/conduit.cgi";
         $data = array(
             'SESSIONID' => $session_id,
             'VIDEOID' => $video_id,
