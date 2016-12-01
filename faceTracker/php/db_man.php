@@ -26,7 +26,13 @@
     function pgQuery($pgConnection, $query) {
         // Note: Using pg_query() for now, but can expand with 
         //       pg_send_query() for multiple connection systems
-        return pg_query($pgConnection, $query);
+        try{
+            $result = pg_query($pgConnection, $query);
+        }catch(Exception $e){
+            throw new Exception($e, 1);
+            
+        }
+        return $result;
     }
 
     // Transform query results into associative array with column names for keys
