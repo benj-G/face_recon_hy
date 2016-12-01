@@ -59,6 +59,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <errno.h>
 #include "libpq-fe.h"
 
 #define TRUE 1
@@ -308,7 +309,7 @@ int processVideo(long in_videoID)
     strncat(img_subdir, base_dir, 1024); 
     strncat(img_subdir, "/", 1);
     strncat(img_subdir, video_ID, MAX_VIDEO_ID_LENGTH);
-    printf("<p>mage subdirectory is %s<BR>", img_subdir);
+    printf("<p>image subdirectory is %s<BR>", img_subdir);
     if(stat(&img_subdir[0], &file_stat) == 0)
     {
       dir_exists = TRUE;
@@ -316,8 +317,9 @@ int processVideo(long in_videoID)
     }
     else
     {
-      if(mkdir(img_subdir, 0755) == 0)
-      {
+
+
+    if(mkdir(img_subdir, 0755) == 0){
         dir_exists = TRUE;
         printf("<p>mkdir() used to create image subdirectory<BR>");
       }
@@ -325,7 +327,8 @@ int processVideo(long in_videoID)
       {
         printf("<p>mkdir() failed creating %s\n", img_subdir);
         printf("<p>System error. Please contact customer support.<BR>");
-        exit(EXIT_FAILURE);
+        printf("%s"), strerror(errno);
+       // exit(EXIT_FAILURE);
       }
     }
     // extract the video frames to still images in the created subdirectory
@@ -348,6 +351,22 @@ int processVideo(long in_videoID)
   }
   PQclear(db_result);
   PQfinish (db_connection);
+
+  //Stitch together video files
+  snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%d.%%d.png -c:v libx264 %s/%d.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
+  fp = popen(ffCommand, "r");
+  if(fp == NULL)
+    {
+      printf("<p>System error. Please contact customer support.<BR>");
+      exit(EXIT_FAILURE);
+    }
+    status = pclose(fp);
+    if(status == -1)
+    {
+      printf("<p>System error. Please contact customer support<BR>");
+      exit(EXIT_FAILURE);
+    }
+
   return 0;
 }
 
