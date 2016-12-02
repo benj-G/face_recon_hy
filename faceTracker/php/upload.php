@@ -3,9 +3,9 @@
     include "db_utils.php";
     include "post_utils.php";
     //linux
-    //$dir = "var/www/html/data/vid"; //absolute path to directory
+    $dir = "/var/www/html/data/vid"; //absolute path to directory
     //windows
-    $dir = "E:/xampp/htdocs/data/vid/";
+    //$dir = "E:/xampp/htdocs/data/vid/";
     $filename = $dir . basename($_FILES["file"]["name"]);
     if(isset($_COOKIE['c_sId'])){
      $cookie_sId = clean_post($_COOKIE['c_sId']);
