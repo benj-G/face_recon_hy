@@ -24,12 +24,24 @@
         $_SESSION['ipaddr'] = filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP);
 
         // insert information into sessions and session_lookup table
+        
+        $dbConn = pgConnect();
+
+        $query1 = "SELECT * FROM SESSIONS WHERE SESSION_ID = '".$_SESSION['sId']."'";
+
+        $result = pgQuery($dbConn, $query1);
+
+        if(pg_num_rows($result) == 0){
         $query2 = "INSERT INTO session_lookup(session_id, user_name) VALUES ('".$_SESSION['sId']."', '".$_SESSION['user_name']."')"; // sanitize?
         $query1 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
 
-        $dbConn = pgConnect();
-        pgQuery($dbConn, $query1);
-        pgQuery($dbConn, $query2);
+        try{
+            pgQuery($dbConn, $query1); //error
+            pgQuery($dbConn, $query2); //error
+        }catch(Exception $e){
+
+        }
+        }
         pgDisconnect($dbConn);
 
         $cookie_sId = $_SESSION['sId'];

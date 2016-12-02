@@ -59,7 +59,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <libgen.h>
-#include "/usr/include/postgresql/libpq-fe.h"
+#include "libpq-fe.h"
+#include <errno.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -100,7 +101,7 @@ int main(void)
   char keyName[9] = "";
   char keyValue[9] = "";
   long videoID = -1;
-  long sessionID = -1;
+  char* sessionID = calloc(MAX_VIDEO_ID_LENGTH, sizeof(char));
   const char *VIDEOID = "VIDEOID=";
   const char *SESSIONID = "SESSIONID=";
   const char *DETAILS = "DETAILS=";
@@ -140,7 +141,7 @@ int main(void)
           if(strcmp(keyName, SESSIONID) == 0) 
           {
             sprintf(keyValue, "%.*s", (int)(strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
-            sessionID = strtol(keyValue, NULL, 10);
+            strcpy(sessionID, keyValue);
           }
           else
           {
@@ -159,13 +160,12 @@ int main(void)
       if(showDetails) 
       {
         printf("<p>Video ID: %d<br>", (int)videoID);
-        printf("<p>Session ID: %d<br>", (int)sessionID);
+        printf("<p>Session ID: %s<br>", sessionID);
       }
       // TODO: validate session id
       
       // process video by video ID
-      if(processVideo(videoID) != 0)
-        printf("<p>Could not process video<BR>");
+      if(processVideo(videoID) != 0) printf("<p>Could not process video<BR>");
     }
   }
   return 0;
@@ -178,12 +178,13 @@ int processVideo(long in_videoID)
   char db_statement[MAX_DB_STATEMENT_BUFFER_LENGTH], 
 //       command_buffer[MAX_COMMAND_BUFFER_LENGTH], 
        video_ID[MAX_VIDEO_ID_LENGTH], 
-       video_filename[MAX_VIDEO_FILENAME_LENGTH];
+       video_filename[MAX_VIDEO_FILENAME_LENGTH],
+       path_name[MAX_COMMAND_LINE + MAX_VIDEO_ID_LENGTH];
   char fr_Height[MAXPARAMLENGTH],
        fr_Width[MAXPARAMLENGTH],
        fr_perSec[MAXPARAMLENGTH],
        nbr_fr[MAXPARAMLENGTH];
-  const char *parameter_values[5];
+  const char *parameter_values[6];
   int parameter_lengths[2];
   int parameter_formats[2];
   int menu, command, row, num_rows;
@@ -261,20 +262,36 @@ int processVideo(long in_videoID)
       }
     }
 //    printf("<p> width is %d, height is %d, fps = %f, #frames is %d<BR>", frameWidth, frameHeight, fps, numFrames);
+    char video_filename_cp[2180];
+    char *base_dir;
+    char img_subdir [1280]; // handle long paths
+    printf("<p>video_filename before dirname() call is %s<BR>", video_filename);
+    strncpy(video_filename_cp, video_filename, 1280);
+    base_dir = dirname(video_filename_cp);
+    printf("<p>video_filename after dirname() call is %s<BR>", video_filename);
+
+    strncat(img_subdir, base_dir, 1024); 
+    strncat(img_subdir, "/", 1);
+    strncat(img_subdir, video_ID, MAX_VIDEO_ID_LENGTH);
+    printf("<p>mage subdirectory is %s<BR>", img_subdir);
+
     // write metadata to the database
     sprintf(fr_Height, "%d", frameHeight);
     sprintf(fr_Width, "%d", frameWidth);
     sprintf(fr_perSec, "%f", fps);
     sprintf(nbr_fr, "%d", numFrames);
     sprintf(video_ID, "%ld", in_videoID);
-    strncpy(&db_statement[0], "UPDATE video_metadata SET num_frames = $1, frame_rate = $2, frame_width = $3, frame_height = $4 WHERE video_id = $5", MAX_DB_STATEMENT_BUFFER_LENGTH);
+    sprintf(path_name, "%s/%s.mp4", img_subdir, video_ID);
+
+    strncpy(&db_statement[0], "UPDATE video_metadata SET num_frames = $1, frame_rate = $2, frame_width = $3, frame_height = $4, out_video_file=$6 WHERE video_id = $5", MAX_DB_STATEMENT_BUFFER_LENGTH);
     parameter_values[0] = &nbr_fr[0];
     parameter_values[1] = &fr_perSec[0];
     parameter_values[2] = &fr_Width[0];
     parameter_values[3] = &fr_Height[0];
     parameter_values[4] = &video_ID[0];
+    parameter_values[5] = &path_name[0];
 
-    db_result = PQexecParams(db_connection, db_statement, 5, NULL, parameter_values, NULL, NULL, 0);
+    db_result = PQexecParams(db_connection, db_statement, 6, NULL, parameter_values, NULL, NULL, 0);
     
     if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
     {
@@ -287,23 +304,13 @@ int processVideo(long in_videoID)
       printf("<p>System error. Please contact customer support<BR>");
       exit(EXIT_FAILURE);
     }
-    
+
     // create a subdirectory for the video's images from frames
     struct stat file_stat;
-    char img_subdir [1280]; // handle long paths
+   
     int dir_exists = FALSE;
-    char *base_dir;
-    char video_filename_cp[2180];
-
-    printf("<p>video_filename before dirname() call is %s<BR>", video_filename);
-    strncpy(video_filename_cp, video_filename, 1280);
-    base_dir = dirname(video_filename_cp);
-    printf("<p>video_filename after dirname() call is %s<BR>", video_filename);
-
-    strncat(img_subdir, base_dir, 1024); 
-    strncat(img_subdir, "/", 1);
-    strncat(img_subdir, video_ID, MAX_VIDEO_ID_LENGTH);
-    printf("<p>mage subdirectory is %s<BR>", img_subdir);
+    
+    
     if(stat(&img_subdir[0], &file_stat) == 0)
     {
       dir_exists = TRUE;
@@ -319,7 +326,7 @@ int processVideo(long in_videoID)
       else
       {
         printf("<p>mkdir() failed creating %s\n", img_subdir);
-        printf("<p>System error. Please contact customer support.<BR>");
+        printf("<p>System error. Please contact customer support. %s<BR>", strerror(errno));
         exit(EXIT_FAILURE);
       }
     }
@@ -340,6 +347,22 @@ int processVideo(long in_videoID)
       exit(EXIT_FAILURE);
     }
 
+
+    //Stitch together video files
+    snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%s.%%d.png -c:v libx264 %s/%s.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
+    printf("\n%s\n", ffCommand);
+    fp = popen(ffCommand, "r");
+    if(fp == NULL)
+      {
+        printf("<p>System error. Please contact customer support.<BR>");
+        exit(EXIT_FAILURE);
+      }
+      status = pclose(fp);
+      if(status == -1)
+      {
+        printf("<p>System error. Please contact customer support<BR>");
+        exit(EXIT_FAILURE);
+      }
   }
   PQclear(db_result);
   PQfinish (db_connection);

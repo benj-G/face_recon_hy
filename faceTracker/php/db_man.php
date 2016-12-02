@@ -9,8 +9,8 @@
         // Temp hardcoded connection info
         $host = "host=127.0.0.1";
         $port = "port=5432";
-        $dbname = "dbname=teamhellyeah";
-        $cred = "user=postgres password=postgres";
+        $dbname = "dbname=pipedream";
+        $cred = "user=piper password=letm3in";
         
         // Note: Pass PGSQL_CONNECT_FORCE_NEW if multiple connections desired
         $pgConnection = pg_connect("$host $port $dbname $cred");
@@ -26,7 +26,13 @@
     function pgQuery($pgConnection, $query) {
         // Note: Using pg_query() for now, but can expand with 
         //       pg_send_query() for multiple connection systems
-        return pg_query($pgConnection, $query);
+        try{
+            $result = pg_query($pgConnection, $query);
+        }catch(Exception $e){
+            throw new Exception($e, 1);
+            
+        }
+        return $result;
     }
 
     // Transform query results into associative array with column names for keys
