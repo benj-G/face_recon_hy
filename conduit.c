@@ -66,15 +66,18 @@
 #define FALSE 0
 #define MAX_COMMAND_LINE 255
 #define MAX_DB_STATEMENT_BUFFER_LENGTH 5000
-#define MAXLEN 80
+#define MAXLEN 127 
 #define MAXPARAMLENGTH 5
 #define MAX_VIDEO_ID_LENGTH 20
+#define MAX_SESSION_ID_LENGTH 255
 #define MAX_VIDEO_FILENAME_LENGTH 255
 #define MAXINPUT MAXLEN+2
 /* 1 for added line break, 1 for trailing NUL */
 // #define DATAFILE "../data/data.txt"
 
+//forward declarations
 int processVideo(long);
+int validSessionID(char *);
 
 void unencode(char *src, char *last, char *dest)
 {
@@ -101,7 +104,7 @@ int main(void)
   char keyName[9] = "";
   char keyValue[9] = "";
   long videoID = -1;
-  char* sessionID = calloc(MAX_VIDEO_ID_LENGTH, sizeof(char));
+  char sessionID[255] = "";
   const char *VIDEOID = "VIDEOID=";
   const char *SESSIONID = "SESSIONID=";
   const char *DETAILS = "DETAILS=";
@@ -114,6 +117,7 @@ int main(void)
   else 
   {
     fgets(input, len+1, stdin);
+ //   printf("<p> the std input is %s.<BR>", input);
     unencode(input, input+len, data);
     // extract values for VIDEO_ID and SESSION_ID from input string
     char *token;
@@ -140,8 +144,8 @@ int main(void)
           keyName[strlen(SESSIONID)] = '\0';
           if(strcmp(keyName, SESSIONID) == 0) 
           {
-            sprintf(keyValue, "%.*s", (int)(strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
-            strcpy(sessionID, keyValue);
+            sprintf(sessionID, "%.*s", (int)(strlen(token) - strlen(SESSIONID)), token + strlen(SESSIONID));
+         //   sessionID = strtol(keyValue, NULL, 10);
           }
           else
           {
@@ -162,12 +166,69 @@ int main(void)
         printf("<p>Video ID: %d<br>", (int)videoID);
         printf("<p>Session ID: %s<br>", sessionID);
       }
-      // TODO: validate session id
-      
+      // validate session id
+      if(validSessionID(sessionID) != 0)
+      {
+        printf("<p>Unexpected values. Please contact Customer Support<BR>");
+        exit(EXIT_FAILURE);
+      }
       // process video by video ID
       if(processVideo(videoID) != 0) printf("<p>Could not process video<BR>");
     }
   }
+  return 0;
+}
+
+int validSessionID(char * in_sessionID)
+{
+  char * req_ipaddr;
+  char * sessionValid;
+  PGconn *db_connection;
+  PGresult *db_result;
+  char db_statement[MAX_DB_STATEMENT_BUFFER_LENGTH],
+       session_ID[MAX_SESSION_ID_LENGTH];
+  char sess_timestamp[MAXPARAMLENGTH],
+       sess_ipaddr[MAXPARAMLENGTH];
+
+  const char *parameter_values[2];
+//  int parameter_lengths[2];
+//  int parameter_formats[2];
+
+  req_ipaddr = getenv("REMOTE_ADDR");
+  printf("<p> the remote addr is '%s'.<BR>", req_ipaddr);
+  db_connection = PQconnectdb("host = 'localhost' dbname = 'pipedream' user = 'piper' password = 'letm3in'");
+  if(PQstatus(db_connection) != CONNECTION_OK)
+  {
+    printf("<p>System error connection failure. Please contact Customer Support.<BR>");
+    PQfinish(db_connection);
+    exit(EXIT_FAILURE);
+  }
+
+  // see if the session is valid by looking for it in the SESSIONS table and checking that the session create timestamp 
+  // is less than 30 minutes old and that the IP address of the caller matches
+
+  snprintf(session_ID, MAX_SESSION_ID_LENGTH, "%s", in_sessionID);
+  parameter_values[0] = &session_ID[0];
+  parameter_values[1] = &req_ipaddr[0];
+  strncpy(&db_statement[0], "SELECT extract(minute from (current_timestamp - session_time)) <= 30 from sessions where session_id = $1 and ipaddr = $2", MAX_DB_STATEMENT_BUFFER_LENGTH);
+  db_result = PQexecParams(db_connection, db_statement, 2, NULL, parameter_values, NULL, NULL, 0);
+  if(PQresultStatus(db_result) != PGRES_TUPLES_OK || PQntuples(db_result) != 1)
+  {
+    printf("<p>System error. Please contact Customer Service.<BR>");
+    exit(EXIT_FAILURE);
+  }
+  else
+  {
+    sessionValid = PQgetvalue(db_result, 0, 0);
+    if(strncmp(sessionValid, "t", 1) != 0)
+    {
+      printf("<p>System error validation failure. Please contact Customer Service.<br>");
+      exit(EXIT_FAILURE);
+    } 
+  }
+
+  PQfinish(db_connection);
+
   return 0;
 }
 
@@ -192,6 +253,7 @@ int processVideo(long in_videoID)
   db_connection = PQconnectdb("host = 'localhost' dbname = 'pipedream' user = 'piper' password = 'letm3in'");
   if(PQstatus(db_connection) != CONNECTION_OK)
   {
+
     printf("<P>System error. Please contact customer support.<BR>");
     PQfinish(db_connection);
     exit(EXIT_FAILURE);
@@ -203,15 +265,13 @@ int processVideo(long in_videoID)
   db_result = PQexecParams(db_connection, db_statement, 1, NULL, parameter_values, NULL, NULL, 0);
   if(PQresultStatus(db_result) != PGRES_TUPLES_OK || PQntuples(db_result) != 1)
   {
-    printf("<p>System error. Please contact customer service.<DB>");
+    printf("<p>System error. Please contact customer service.<BR>");
   }
   else
   {
     // assuming a singular result
     sprintf(video_filename, "%s", PQgetvalue(db_result, 0, 0));
-//    printf("<P>The video filename is %s", video_filename);
 
-    // have the filename, let's get the metadata
     FILE *fp;
     int status;
     char entry[MAXLEN];
@@ -222,6 +282,7 @@ int processVideo(long in_videoID)
     int frameWidth = -1;
     float fps = -1.0;
     int numFrames = -1;
+    char * ech; // error location
     
     snprintf(ffCommand, MAX_COMMAND_LINE, "%s %s", "ffprobe -v error -count_frames -select_streams v:0 -show_entries stream=height,width,avg_frame_rate,nb_read_frames -of default=noprint_wrappers=1:nokey=1", video_filename);
 
@@ -261,10 +322,15 @@ int processVideo(long in_videoID)
           printf("<p>System error. Please contact customer support.<BR>");
       }
     }
+    if(entryCount == 0)
+    {
+      printf("<p>Uploaded video file could not be processed, video format not detected.<BR>");
+      exit(EXIT_FAILURE);
+    }
 //    printf("<p> width is %d, height is %d, fps = %f, #frames is %d<BR>", frameWidth, frameHeight, fps, numFrames);
     char video_filename_cp[2180];
     char *base_dir;
-    char img_subdir [1280]; // handle long paths
+    char* img_subdir = calloc(2180, sizeof(char)); // handle long paths
     printf("<p>video_filename before dirname() call is %s<BR>", video_filename);
     strncpy(video_filename_cp, video_filename, 1280);
     base_dir = dirname(video_filename_cp);
