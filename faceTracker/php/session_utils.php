@@ -46,11 +46,9 @@
             if (isset($_COOKIE['PHPSESSID'])) {
                 unset($_COOKIE['PHPSESSID']);
                setcookie('PHPSESSID', '', time() - 3600, '/'); // empty value and old timestamp
-               // die("in loop");
             } 
         }                                                                        
         pgDisconnect($dbConn);
-
         return $valid_session;
     }
 
@@ -69,5 +67,19 @@
         recreate_session($row['user_name']);
     }
     
+    function get_username_from_sessions($cookie_containing_session){
+        $dbConn = pgConnect();
+        $query = ("SELECT * FROM sessions WHERE session_id='$cookie_containing_session'");
+        $results = pgQuery($dbConn, $query);
+        $tuple = pg_fetch_assoc($results);
+        if(count($tuple) == 0) return; //remove cookies?
+        else $session_id = $tuple['session_id'];
+        $query = ("SELECT user_name from session_lookup WHERE session_id='$session_id'");
+        $results = pgQuery($dbConn, $query);
+        $row = pg_fetch_assoc($results);
+        pgDisconnect($dbConn);
+        //die(var_dump($row['user_name']));
+        return ($row['user_name']); 
+    }
 
 ?>
