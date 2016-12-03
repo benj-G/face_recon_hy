@@ -273,6 +273,7 @@ int processVideo(long in_videoID)
     sprintf(video_filename, "%s", PQgetvalue(db_result, 0, 0));
 
     FILE *fp;
+    FILE *mov;
     int status;
     char entry[MAXLEN];
     int entryCount = 0;
@@ -325,6 +326,7 @@ int processVideo(long in_videoID)
     if(entryCount == 0)
     {
       printf("<p>Uploaded video file could not be processed, video format not detected.<BR>");
+      remove(video_filename);
       exit(EXIT_FAILURE);
     }
 //    printf("<p> width is %d, height is %d, fps = %f, #frames is %d<BR>", frameWidth, frameHeight, fps, numFrames);
@@ -429,9 +431,15 @@ int processVideo(long in_videoID)
         printf("<p>System error. Please contact customer support<BR>");
         exit(EXIT_FAILURE);
       }
+    // move old video file into new directory
+    char* mov_dir = calloc(MAX_VIDEO_FILENAME_LENGTH, sizeof(char));
+    sprintf(mov_dir, "%s/%s", img_subdir, "oldvfile");
+    printf(" - %s - ", mov_dir);
+    rename(video_filename, mov_dir);
   }
   PQclear(db_result);
   PQfinish (db_connection);
+
   return 0;
 }
 
