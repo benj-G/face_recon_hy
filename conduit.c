@@ -78,7 +78,7 @@
 //forward declarations
 int processVideo(long);
 int validSessionID(char *);
-
+void back_to_login();
 void unencode(char *src, char *last, char *dest)
 {
  for(; src != last; src++, dest++)
@@ -170,6 +170,7 @@ int main(void)
       if(validSessionID(sessionID) != 0)
       {
         printf("<p>Unexpected values. Please contact Customer Support<BR>");
+        back_to_login();
         exit(EXIT_FAILURE);
       }
       // process video by video ID
@@ -201,6 +202,7 @@ int validSessionID(char * in_sessionID)
   {
     printf("<p>System error connection failure. Please contact Customer Support.<BR>");
     PQfinish(db_connection);
+    back_to_login();
     exit(EXIT_FAILURE);
   }
 
@@ -215,6 +217,7 @@ int validSessionID(char * in_sessionID)
   if(PQresultStatus(db_result) != PGRES_TUPLES_OK || PQntuples(db_result) != 1)
   {
     printf("<p>System error. Please contact Customer Service.<BR>");
+    back_to_login();
     exit(EXIT_FAILURE);
   }
   else
@@ -223,6 +226,7 @@ int validSessionID(char * in_sessionID)
     if(strncmp(sessionValid, "t", 1) != 0)
     {
       printf("<p>System error validation failure. Please contact Customer Service.<br>");
+      back_to_login();
       exit(EXIT_FAILURE);
     } 
   }
@@ -256,6 +260,7 @@ int processVideo(long in_videoID)
 
     printf("<P>System error. Please contact customer support.<BR>");
     PQfinish(db_connection);
+    back_to_login();
     exit(EXIT_FAILURE);
   }
   // see if the videoID is valid by getting the src_video_file 
@@ -290,6 +295,7 @@ int processVideo(long in_videoID)
     if(fp == NULL)
     {
       printf("<p>System error. Please contact customer support.<BR>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
     while(fgets(entry, MAXLEN, fp) != NULL)
@@ -325,6 +331,7 @@ int processVideo(long in_videoID)
     if(entryCount == 0)
     {
       printf("<p>Uploaded video file could not be processed, video format not detected.<BR>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
 //    printf("<p> width is %d, height is %d, fps = %f, #frames is %d<BR>", frameWidth, frameHeight, fps, numFrames);
@@ -362,12 +369,14 @@ int processVideo(long in_videoID)
     if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
     {
       printf("<p>System error. Please contact customer service.<DB>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
     status = pclose(fp);
     if(status == -1)
     {
       printf("<p>System error. Please contact customer support<BR>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
 
@@ -393,6 +402,7 @@ int processVideo(long in_videoID)
       {
         printf("<p>mkdir() failed creating %s\n", img_subdir);
         printf("<p>System error. Please contact customer support. %s<BR>", strerror(errno));
+        back_to_login();
         exit(EXIT_FAILURE);
       }
     }
@@ -404,12 +414,14 @@ int processVideo(long in_videoID)
     if(fp == NULL)
     {
       printf("<p>System error. Please contact customer support.<BR>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
     status = pclose(fp);
     if(status == -1)
     {
       printf("<p>System error. Please contact customer support<BR>");
+      back_to_login();
       exit(EXIT_FAILURE);
     }
 
@@ -421,19 +433,24 @@ int processVideo(long in_videoID)
     if(fp == NULL)
       {
         printf("<p>System error. Please contact customer support.<BR>");
+        back_to_login();
         exit(EXIT_FAILURE);
       }
       status = pclose(fp);
       if(status == -1)
       {
         printf("<p>System error. Please contact customer support<BR>");
+        back_to_login();
         exit(EXIT_FAILURE);
       }
   }
   PQclear(db_result);
   PQfinish (db_connection);
   // my custom preferences printf("login.php");
-  printf("<meta http-equiv=\"refresh\" content=\"2; URL=login.php\">");
+  back_to_login();
   return 0;
 }
 
+void back_to_login(){
+    printf("<meta http-equiv=\"refresh\" content=\"4; URL=login.php\">");
+}
