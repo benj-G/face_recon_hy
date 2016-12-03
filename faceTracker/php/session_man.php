@@ -27,20 +27,30 @@
         
         $dbConn = pgConnect();
 
-        $query1 = "SELECT * FROM SESSIONS WHERE SESSION_ID = '".$_SESSION['sId']."'";
+        $query1 = "SELECT * FROM SESSION_LOOKUP WHERE SESSION_ID = '".$_SESSION['sId']."' OR USER_NAME='".$_SESSION['user_name']."'";
 
         $result = pgQuery($dbConn, $query1);
+        $row = pg_fetch_row($result);
+        if(!$row){
+            $query2 = "INSERT INTO session_lookup(session_id, user_name) VALUES ('".$_SESSION['sId']."', '".$_SESSION['user_name']."')"; // sanitize?
+            $query1 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
 
-        if(pg_num_rows($result) == 0){
-        $query2 = "INSERT INTO session_lookup(session_id, user_name) VALUES ('".$_SESSION['sId']."', '".$_SESSION['user_name']."')"; // sanitize?
-        $query1 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
+            try{
+                pgQuery($dbConn, $query1); //error
+                pgQuery($dbConn, $query2); //error
+            }catch(Exception $e){
 
-        try{
-            pgQuery($dbConn, $query1); //error
-            pgQuery($dbConn, $query2); //error
-        }catch(Exception $e){
-
+            }
         }
+        else{
+            $query2 = "UPDATE session_lookup SET session_id = '".$_SESSION['sId']."' WHERE user_name = '".$_SESSION['user_name']."'"; // sanitize?
+            $query1 = "INSERT INTO sessions(session_id, session_time, ipaddr) VALUES ('".$_SESSION['sId']."', now(), '".$_SESSION['ipaddr']."')";
+            try{
+                pgQuery($dbConn, $query1); //error
+                pgQuery($dbConn, $query2); //error
+            }catch(Exception $e){
+
+            }    
         }
         pgDisconnect($dbConn);
 
