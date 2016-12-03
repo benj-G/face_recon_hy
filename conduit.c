@@ -436,6 +436,17 @@ int processVideo(long in_videoID)
     sprintf(mov_dir, "%s/%s", img_subdir, "oldvfile");
     printf(" - %s - ", mov_dir);
     rename(video_filename, mov_dir);
+    parameter_values[0] = mov_dir;
+    parameter_values[1] = video_ID;
+
+    strncpy(&db_statement[0], "UPDATE VIDEO_METADATA SET SRC_VIDEO_FILE=$1 WHERE VIDEO_ID=$2", MAX_DB_STATEMENT_BUFFER_LENGTH);
+    db_result = PQexecParams(db_connection, db_statement, 2, NULL, parameter_values, NULL, NULL, 0);
+    
+    if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
+    {
+      printf("<p>System error. Please contact customer service.<DB>");
+      exit(EXIT_FAILURE);
+    }
   }
   PQclear(db_result);
   PQfinish (db_connection);
