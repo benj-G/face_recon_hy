@@ -432,6 +432,8 @@ int processVideo(long in_videoID)
   }
   PQclear(db_result);
   PQfinish (db_connection);
+  // my custom preferences printf("login.php");
+  printf("<meta http-equiv=\"refresh\" content=\"2; URL=login.php\">");
   return 0;
 }
 
