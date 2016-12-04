@@ -82,4 +82,36 @@
         return ($row['user_name']); 
     }
 
+    // Returns current user_id
+    function get_current_user_id() {
+        if(isset($_COOKIE['c_sId']) && isset($_COOKIE['PHPSESSID'])) {
+            $sessionId = $_COOKIE['PHPSESSID'];
+
+            // Fetching user name
+            $query = ("SELECT user_name FROM session_lookup WHERE session_id='$sessionId'");
+
+            $dbConn = pgConnect();
+            $results = pgQuery($dbConn, $query);
+            pgDisconnect($dbConn);
+
+            $row = pgFetchAssoc($results);
+            $userName = $row['user_name']; 
+            
+            // Fetching user id with user name
+            $query = ("SELECT user_id FROM user_profiles WHERE user_name='$userName'");
+
+            $dbConn = pgConnect();
+            $results = pgQuery($dbConn, $query);
+            pgDisconnect($dbConn);
+
+            $row = pgFetchAssoc($results);
+            $userId = $row['user_id'];
+            
+            return $userId;
+        }
+
+        // Else nonexistant id 0
+        return 0;
+    }
+
 ?>
