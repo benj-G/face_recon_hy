@@ -89,4 +89,16 @@
         return pgFetchAssoc($results);        
     }
 
+    // Returns a map of video ids and file paths for a given user
+    function get_vid_paths($userId) {
+        $userIdInt = intval($userId);
+        $query = "SELECT video_id, out_video_file FROM video_metadata WHERE user_id = $userIdInt";
+            
+        $dbConn = pgConnect();
+        $results = pgQuery($dbConn, $query);
+        pgDisconnect($dbConn);
+                
+        return $results;
+    }
+
 ?>
