@@ -53,7 +53,8 @@
         if($vidMetaData != false) {
             // Building HTML list element for each found video
             while($row = pgFetchAssoc($vidMetaData)) {
-                $videoTag .= "<li>" . $vidSubTag . $row['out_video_file'] . "'/></li>";
+                $localpath = substr($row['out_video_file'], strpos($row['out_video_file'], "/data"), strlen($row['out_video_file']));
+                $videoTag .= "<li>" . $vidSubTag . "../.." . $localpath . "'/></li>";
             }
         }
         
