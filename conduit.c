@@ -429,10 +429,10 @@ int processVideo(long in_videoID)
       exit(EXIT_FAILURE);
     }
 
-    // Get info for database
+    // Store Facial points in database
     char* script_info = calloc(250, sizeof(char));
-    //sprintf(script_info, "./FaceLandmarkImg \\\n--inputDir /var/www/html/data/74/ \\\n--videoId 67\\\n--dbHost localhost \\\n--dbName pipedream\\\n--dbUser piper \\\n--dbPasword letm3in");
-    sprintf(script_info, "./hellyeah_test.sh");
+    sprintf(script_info, "./startLandmark.sh %s", video_ID);
+    //sprintf(script_info, "./hellyeah_test.sh");
     fp = popen(script_info, "r");
     if(fp == NULL)
       {
