@@ -429,10 +429,29 @@ int processVideo(long in_videoID)
       exit(EXIT_FAILURE);
     }
 
+    // Get info for database
+    char* script_info = calloc(250, sizeof(char));
+    //sprintf(script_info, "./FaceLandmarkImg \\\n--inputDir /var/www/html/data/74/ \\\n--videoId 67\\\n--dbHost localhost \\\n--dbName pipedream\\\n--dbUser piper \\\n--dbPasword letm3in");
+    sprintf(script_info, "./hellyeah_test.sh");
+    fp = popen(script_info, "r");
+    if(fp == NULL)
+      {
+        printf("<p>System error. Please contact customer support.<BR>");
+        back_to_login();
+        exit(EXIT_FAILURE);
+      }
+      status = pclose(fp);
+      if(status == -1)
+      {
+        printf("<p>System error. Please contact customer support<BR>");
+        back_to_login();
+        exit(EXIT_FAILURE);
+      }
+    printf("\nString not printing:%s\n", script_info);
 
     //Stitch together video files
     snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%s.%%d.png -c:v libx264 %s/%s.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
-    printf("\n%s\n", ffCommand);
+    printf("\n\n%s\n\n", ffCommand);
     fp = popen(ffCommand, "r");
     if(fp == NULL)
       {
