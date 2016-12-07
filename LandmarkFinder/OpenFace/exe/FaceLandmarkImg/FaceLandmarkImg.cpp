@@ -196,6 +196,7 @@ public:
         int n = clnf_model.patch_experts.visibilities[0][0].rows;
         for (int i = 0; i < n; ++i)
         {
+            cout << "inserting landmark: " << clnf_model.detected_landmarks.at<double>(i) << ", " << clnf_model.detected_landmarks.at<double>(i+n) << endl;
             ss << ", " << clnf_model.detected_landmarks.at<double>(i);
             ss << ", " << clnf_model.detected_landmarks.at<double>(i + n);
         }

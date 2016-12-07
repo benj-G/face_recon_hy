@@ -1,7 +1,6 @@
 #!/bin/bash
 
-sudo -v
-sudo cp -rp ./OpenFace ~/src/OpenFace
+sudo cp -rp ./OpenFace ~/src/
 cd ~/src/OpenFace/build
 make FaceLandmarkImg
 sudo make install
