@@ -6,6 +6,10 @@
 #include <queue>
 #include <stdio.h>
 #include <math.h>
+#include <qxx/pqxx>
+
+using namespace std;
+using namepace pqxx;
 
 #include "constants.h"
 #include "findEyeCenter.h"
@@ -13,7 +17,7 @@
 
 
 /** Constants **/
-
+int vid_id = 0;
 
 /** Function Headers */
 void detectAndDisplay( cv::Mat frame );
@@ -116,6 +120,35 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   cv::Point leftPupil = findEyeCenter(faceROI,leftEyeRegion,"Left Eye");///left eye center
   cv::Point rightPupil = findEyeCenter(faceROI,rightEyeRegion,"Right Eye");//right eye center
     
+    try {
+        connection C("dbname=pipedream user=postgres password=postgres \
+                     hostaddr=127.0.0.1 port=5432");
+        if (C.is_open()) {
+            cout << "Database connected: " << C.dbname() << endl;
+        } else {
+            cout << "Can't open database" << endl;
+        }
+        
+        // CREATE TRANSACTIONAL OBJECT
+        work W(C);
+    
+        // UPDATE VIDEO_DATA TABLE
+        sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :leftPupil.x where VIDEO_ID = :vid_id"
+        sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :leftPupil.y where VIDEO_ID = :vid_id"
+        sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :rightPupil.x where VIDEO_ID = :vid_id"
+        sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_Y = :rightPupil.y where VIDEO_ID = :vid_id"
+        
+        // EXECUTE SQL QUERY
+        W.exec(sql);
+        W.commit();
+        cout << "Data updated." << endl;
+        
+        C.disconnect();
+
+    } catch(const std::exception &e) {
+        cerr << e.what() << std::endl;
+    }
+    /*
     char *sql;
     try {
         connection C("dbname=pipedream user=postgres password=postgres \hostaddr=127.0.0.1 port=5432");
@@ -133,7 +166,7 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
         "LEFTY INT NOT NULL);";
         
         
-        sql = "EXEC SQL INSERT INTO COORDINATES VALUES(:rightPupil.x, rightPupil.y, :leftPupil.x, :leftPupil.y)";
+        sql = "EXEC SQL INSERT INTO COORDINATES VALUES(:rightPupil.x, :rightPupil.y, :leftPupil.x, :leftPupil.y)";
         
         // Create a transactional object
         work W(C);
@@ -146,7 +179,7 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     } catch (const std::exception &e) {
         cerr << e.what() << std::endl;
     }
-    
+    */
   // get corner regions
   cv::Rect leftRightCornerRegion(leftEyeRegion);
   leftRightCornerRegion.width -= leftPupil.x;
