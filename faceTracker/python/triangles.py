@@ -57,13 +57,12 @@ if metadata is None: # make sure that worked
 print "metadata: ", metadata
 
 (numFrames, frameWidth, frameHeight) = metadata
-# numFrames = int(numFrames)
-# frameWidth = int(frameWidth)
-# frameHeight = int(frameHeight)
 print "{} frames available for this video".format(numFrames)
 
 # LOOP OVER FRAMES, GETTING LANDMARKS AND PUPILS, CREATING TRIANGLES, AND DRAWING MARKED IMAGES
 for curFrame in range(1,numFrames+1):
+
+    print "Processing frame ", curFrame
 
     # CREATE IMG PATH
     imgFileName = "{v}.{f}.png".format(v=videoId, f=curFrame)
@@ -76,6 +75,7 @@ for curFrame in range(1,numFrames+1):
         raise Exception("Unable to load image")
 
     # GET PUPILS AND LANDMARKS
+    print "SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}".format(v=videoId, f=curFrame)
     try:
         cur.execute("SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}".format(v=videoId, f=curFrame))
     except Exception as e:
