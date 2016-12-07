@@ -42,10 +42,10 @@ except Exception as e:
 cur = conn.cursor()
 
 # GET METADATA
-selectString = "SELECT frame_num,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId)
+selectString = "SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId)
 print "SELECT command for metadata: ", selectString
 try:
-    cur.execute("SELECT frame_num,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId))
+    cur.execute("SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId))
 except Exception as e:
     print "Error selecting from metadata table", e
     exit(1)
