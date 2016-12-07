@@ -90,11 +90,13 @@ for curFrame in range(1,numFrames+1):
     print videoData
     print "Length of video data row from select statement: {}".format(len(videoData))
 
+    pupils = videoData[9:13]
     pupils = map(int, pupils)
-    pupils = zip(videoData[9:13],videoData[9:13])
+    pupils = zip(pupils,pupils)
     print "Pupils:", pupils
+    landmarks = videoData[13:149]
     landmarks = map(int, landmarks)
-    landmarks = zip(videoData[13:149],videoData[13:149])
+    landmarks = zip(landmarks,landmarks)
     print "Landmarks:", landmarks
 
     # GET DELAUNAY TRIANGLES
