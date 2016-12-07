@@ -90,9 +90,10 @@ for curFrame in range(1,numFrames+1):
     print videoData
     print "Length of video data row from select statement: {}".format(len(videoData))
 
+    pupils = map(int, pupils)
     pupils = zip(videoData[9:13],videoData[9:13])
-    pupils = map(int,pupils)
     print "Pupils:", pupils
+    landmarks = map(int, landmarks)
     landmarks = zip(videoData[13:149],videoData[13:149])
     print "Landmarks:", landmarks
 
