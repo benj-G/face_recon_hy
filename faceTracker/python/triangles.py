@@ -74,7 +74,7 @@ for curFrame in range(1,numFrames+1):
 
     # GET PUPILS AND LANDMARKS
     try:
-        cur.execute("SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}}".format(v=videoId, f=curFrame))
+        cur.execute("SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}".format(v=videoId, f=curFrame))
     except Exception as e:
         print "Error selecting from video_data table", e
         exit(1)
