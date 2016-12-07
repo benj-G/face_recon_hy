@@ -26,11 +26,15 @@ parser.add_argument("--dbUser", required=True)
 parser.add_argument("--dbPassword", required=True)
 args = vars(parser.parse_args())
 videoId = args['videoId']
-inputDir = os.path.dirname(['inputDir'])
+print videoId
+inputDir = args(['inputDir'])
 print inputDir
 dbName = args['dbName']
+print dbName
 dbUser = args['dbUser']
+print dbUser
 dbPassword = args['dbPassword']
+print dbPassword
 
 # CONNECT TO DB
 print "Connecting to DB..."
