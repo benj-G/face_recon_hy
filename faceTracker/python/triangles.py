@@ -107,6 +107,8 @@ for curFrame in range(1,numFrames+1):
     for landmark in landmarks:
         if rect_contains(rect,landmark):
             subdiv.insert(landmark)
+        else:
+            print "Landmark out of bounds:", landmark
     triangleList = subdiv.getTriangleList()
     print(triangleList)
 
@@ -131,6 +133,8 @@ for curFrame in range(1,numFrames+1):
             cv2.line(bgrImg, pt1, pt2, delaunayColor, 1, cv2.CV_AA, 0)
             cv2.line(bgrImg, pt2, pt3, delaunayColor, 1, cv2.CV_AA, 0)
             cv2.line(bgrImg, pt3, pt1, delaunayColor, 1, cv2.CV_AA, 0)
+        else:
+            print "Triangle points out of bounds!",(pt1,pt2,pt3)
 
     # OVERWRITE ORIGINAL IMAGE
     cv2.imwrite(imgPath, bgrImg)
