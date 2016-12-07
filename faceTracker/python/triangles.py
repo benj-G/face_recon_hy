@@ -34,7 +34,7 @@ dbPassword = args['dbPassword']
 # CONNECT TO DB
 print "Connecting to DB..."
 try:
-    conn = pg.connect("dbname=%s user=%s password=%s", (dbName, dbUser, dbPassword))
+    conn = pg.connect("dbname={n} user={u} password={p}".format(n=dbName, u=dbUser, p=dbPassword))
 except Exception as e:
     print "Error connecting to db", e
     exit(1)
@@ -42,16 +42,19 @@ except Exception as e:
 cur = conn.cursor()
 
 # GET METADATA
+selectString = "SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId)
+print "SELECT command for metadata: ", selectString
 try:
-    cur.execute("SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id=%s", videoId)
+    cur.execute("SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId))
 except Exception as e:
     print "Error selecting from metadata table", e
     exit(1)
 
 metadata = cur.fetchone()
-if (len(metadata)) != 3: # make sure that worked
-    print "Didn't get enough values from the metadata table (wtf)"
+if metadata is None: # make sure that worked
+    print "metadata is none!"
     exit(1)
+print "metadata: ", metadata
 
 (numFrames, frameWidth, frameHeight) = metadata
 print "{} frames in DB for this video".format(numFrames)
