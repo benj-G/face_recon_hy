@@ -91,6 +91,7 @@ for curFrame in range(1,numFrames+1):
     print "Length of video data row from select statement: {}".format(len(videoData))
 
     pupils = zip(videoData[9:13],videoData[9:13])
+    pupils = map(int,pupils)
     print "Pupils:", pupils
     landmarks = zip(videoData[13:149],videoData[13:149])
     print "Landmarks:", landmarks
@@ -102,7 +103,7 @@ for curFrame in range(1,numFrames+1):
     subdiv.initDelaunay(rect)
     for landmark in landmarks:
         if rect_contains(rect,landmark):
-            subdiv.insert(cv2.Point())
+            subdiv.insert(landmark)
     triangleList = subdiv.getTriangleList()
     print(triangleList)
 
