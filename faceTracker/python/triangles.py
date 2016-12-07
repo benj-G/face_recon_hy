@@ -103,7 +103,7 @@ for curFrame in range(1,numFrames+1):
 
     # GET DELAUNAY TRIANGLES
     dims = bgrImg.shape
-    rect = (0, 0, frameWidth, frameHeight)
+    rect = (0, 0, frameHeight, frameWidth)
     print "Bounding rect:",rect
     subdiv = cv2.Subdiv2D()
     subdiv.initDelaunay(rect)
