@@ -136,3 +136,4 @@ for curFrame in range(1,numFrames+1):
 
 cur.close()
 conn.close()
+print "script finished!"
