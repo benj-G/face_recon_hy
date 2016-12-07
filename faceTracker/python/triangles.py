@@ -20,7 +20,7 @@ def rect_contains(rect, point) :
 print "Parsing arguments..."
 parser = argparse.ArgumentParser()
 parser.add_argument("--videoId", required=True)
-parser.add_argument("--inputDir", required=True)
+parser.add_argument("--inputDir", required=True, help="Path to directory containing image files for frames of this video")
 parser.add_argument("--dbName", required=True)
 parser.add_argument("--dbUser", required=True)
 parser.add_argument("--dbPassword", required=True)
