@@ -58,6 +58,8 @@ print "metadata: ", metadata
 
 (numFrames, frameWidth, frameHeight) = metadata
 print "{} frames available for this video".format(numFrames)
+print "frame width:",frameWidth
+print "frame height:",frameHeight
 
 # LOOP OVER FRAMES, GETTING LANDMARKS AND PUPILS, CREATING TRIANGLES, AND DRAWING MARKED IMAGES
 for curFrame in range(1,numFrames+1):
