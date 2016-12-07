@@ -27,7 +27,7 @@ parser.add_argument("--dbPassword", required=True)
 args = vars(parser.parse_args())
 videoId = args['videoId']
 print videoId
-inputDir = args(['inputDir'])
+inputDir = args['inputDir']
 print inputDir
 dbName = args['dbName']
 print dbName
