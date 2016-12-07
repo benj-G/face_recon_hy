@@ -42,10 +42,10 @@ except Exception as e:
 cur = conn.cursor()
 
 # GET METADATA
-selectString = "SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId)
+selectString = "SELECT frame_num,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId)
 print "SELECT command for metadata: ", selectString
 try:
-    cur.execute("SELECT num_frames,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId))
+    cur.execute("SELECT frame_num,frame_width,frame_height FROM video_metadata WHERE video_id={}".format(videoId))
 except Exception as e:
     print "Error selecting from metadata table", e
     exit(1)
@@ -80,6 +80,11 @@ for curFrame in range(1,numFrames+1):
         exit(1)
 
     videoData = cur.fetchone()
+    if videoData is None:  # make sure that worked
+        print "videoData is none!"
+        exit(1)
+
+    print videoData
     print "Length of video data row from select statement: {}".format(len(videoData))
 
     pupils = zip(videoData[9:13],videoData[9:13])
