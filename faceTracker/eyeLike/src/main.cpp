@@ -121,6 +121,7 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   cv::Point rightPupil = findEyeCenter(faceROI,rightEyeRegion,"Right Eye");//right eye center
     
     try {
+        char *sql;
         connection C("dbname=pipedream user=postgres password=postgres \
                      hostaddr=127.0.0.1 port=5432");
         if (C.is_open()) {
