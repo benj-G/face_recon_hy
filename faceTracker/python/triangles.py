@@ -133,9 +133,9 @@ for curFrame in range(1,numFrames+1):
         pt2 = (t[2], t[3])
         pt3 = (t[4], t[5])
         if rect_contains(rect, pt1) and rect_contains(rect, pt2) and rect_contains(rect, pt3):
-            cv2.line(bgrImg, pt1, pt2, delaunayColor, 1, cv2.CV_AA, 0)
-            cv2.line(bgrImg, pt2, pt3, delaunayColor, 1, cv2.CV_AA, 0)
-            cv2.line(bgrImg, pt3, pt1, delaunayColor, 1, cv2.CV_AA, 0)
+            cv2.line(bgrImg, pt1, pt2, delaunayColor, 1, 8, 0)
+            cv2.line(bgrImg, pt2, pt3, delaunayColor, 1, 8, 0)
+            cv2.line(bgrImg, pt3, pt1, delaunayColor, 1, 8, 0)
         else:
             print "Triangle points out of bounds!",(pt1,pt2,pt3)
 
