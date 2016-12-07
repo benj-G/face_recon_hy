@@ -51,7 +51,7 @@
 
     } else {
         // Redirect to form submission error page
-        header("Location: ../login.html");
+        header("Location: ../login.php");
         // error: "Submission failed. Please try again."
     }
 
