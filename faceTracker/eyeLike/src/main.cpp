@@ -134,14 +134,22 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
         work W(C);
     
         // UPDATE VIDEO_DATA TABLE
-        sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :leftPupil.x where VIDEO_ID = :vid_id"
-        sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :leftPupil.y where VIDEO_ID = :vid_id"
-        sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :rightPupil.x where VIDEO_ID = :vid_id"
-        sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_Y = :rightPupil.y where VIDEO_ID = :vid_id"
+        //sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :leftPupil.x where VIDEO_ID = :vid_id"
+        sprintf("UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", leftPupil.x, vid_id);
+        W.commit();
+        //sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :leftPupil.y where VIDEO_ID = :vid_id"
+        sprintf("UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :%d where VIDEO_ID = :%i", leftPupil.y, vid_id);
+        W.commit();
+        //sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :rightPupil.x where VIDEO_ID = :vid_id"
+        sprintf("UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", rightPupil.x, vid_id);
+        W.commit();
+        //sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_Y = :rightPupil.y where VIDEO_ID = :vid_id"
+        sprintf("UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", rightPupil.y, vid_id);
+        W.commit();
         
         // EXECUTE SQL QUERY
-        W.exec(sql);
-        W.commit();
+        //W.exec(sql);
+       // W.commit();
         cout << "Data updated." << endl;
         
         C.disconnect();
