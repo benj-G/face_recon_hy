@@ -94,11 +94,11 @@ for curFrame in range(1,numFrames+1):
 
     pupils = videoData[9:13]
     pupils = map(int, pupils)
-    pupils = zip(pupils,pupils)
+    pupils = zip(pupils[::2],pupils[1::2])
     print "Pupils:", pupils
     landmarks = videoData[13:149]
     landmarks = map(int, landmarks)
-    landmarks = zip(landmarks,landmarks)
+    landmarks = zip(landmarks[::2],landmarks[1::2])
     print "Landmarks:", landmarks
 
     # GET DELAUNAY TRIANGLES
