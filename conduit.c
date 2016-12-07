@@ -431,7 +431,7 @@ int processVideo(long in_videoID)
 
     // Store Facial points in database
     char* script_info = calloc(250, sizeof(char));
-    sprintf(script_info, "./startLandmark.sh %s", video_ID);
+    sprintf(script_info, "./startLandmark.sh %s -j4", video_ID);
     //sprintf(script_info, "./hellyeah_test.sh");
     fp = popen(script_info, "r");
     if(fp == NULL)
@@ -448,6 +448,24 @@ int processVideo(long in_videoID)
         exit(EXIT_FAILURE);
       }
     printf("\nString not printing:%s\n", script_info);
+
+    char* call_draw = calloc(250, sizeof(char));
+    sprintf(call_draw, "./triangle_start.sh %s > %s/%s", video_ID, img_subdir, "log.txt");
+    printf("<br><br><br><br><br>Command: %s<br><br><br>", call_draw);
+    fp = popen(call_draw, "r");
+    if(fp == NULL)
+      {
+        printf("<p>System error. Please contact customer support.<BR>");
+        back_to_login();
+        exit(EXIT_FAILURE);
+      }
+      status = pclose(fp);
+      if(status == -1)
+      {
+        printf("<p>System error. Please contact customer support<BR>");
+        back_to_login();
+        exit(EXIT_FAILURE);
+      }
 
     //Stitch together video files
     snprintf(ffCommand, MAX_COMMAND_LINE, "ffmpeg -v error -framerate %f -i %s/%s.%%d.png -c:v libx264 %s/%s.mp4", fps, img_subdir, video_ID, img_subdir, video_ID);
