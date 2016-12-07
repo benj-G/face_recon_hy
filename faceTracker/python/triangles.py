@@ -57,7 +57,10 @@ if metadata is None: # make sure that worked
 print "metadata: ", metadata
 
 (numFrames, frameWidth, frameHeight) = metadata
-print "{} frames in DB for this video".format(numFrames)
+numFrames = int(numFrames)
+frameWidth = int(frameWidth)
+frameHeight = int(frameHeight)
+print "{} frames available for this video".format(numFrames)
 
 # LOOP OVER FRAMES, GETTING LANDMARKS AND PUPILS, CREATING TRIANGLES, AND DRAWING MARKED IMAGES
 for curFrame in range(1,numFrames+1):
