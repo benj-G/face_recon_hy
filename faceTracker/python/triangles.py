@@ -101,6 +101,7 @@ for curFrame in range(1,numFrames+1):
     subdiv = cv2.Subdiv2D()
     subdiv.initDelaunay(rect)
     for landmark in landmarks:
+        print landmark
         subdiv.insert(landmark)
     triangleList = subdiv.getTriangleList()
     print(triangleList)
