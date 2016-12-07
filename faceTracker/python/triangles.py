@@ -118,7 +118,8 @@ for curFrame in range(1,numFrames+1):
     # DRAW LANDMARKS
     landmarkColor = (0, 0, 255)
     for landmark in landmarks:
-        cv2.circle(bgrImg, landmark, 2, pupilColor, -1)
+        if (rect_contains(rect, landmark)):
+            cv2.circle(bgrImg, landmark, 2, pupilColor, -1)
 
     # DRAW TRIANGLES
     delaunayColor = (100, 100, 100)
