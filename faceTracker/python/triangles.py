@@ -66,17 +66,7 @@ for curFrame in range(1,numFrames+1):
 
     print "Processing frame ", curFrame
 
-    # CREATE IMG PATH
-    imgFileName = "{v}.{f}.png".format(v=videoId, f=curFrame)
-    imgPath = os.path.join(inputDir, imgFileName)
-    print imgPath
-
-    # LOAD IMAGE
-    bgrImg = cv2.imread(imgPath)
-    if bgrImg is None:
-        raise Exception("Unable to load image")
-
-    # GET PUPILS AND LANDMARKS
+    # CHECK THAT ROW EXISTS AND GET PUPILS AND LANDMARKS
     print "SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}".format(v=videoId, f=curFrame)
     try:
         cur.execute("SELECT * FROM video_data WHERE video_id={v} AND frame_num={f}".format(v=videoId, f=curFrame))
@@ -86,8 +76,8 @@ for curFrame in range(1,numFrames+1):
 
     videoData = cur.fetchone()
     if videoData is None:  # make sure that worked
-        print "videoData is none!"
-        exit(1)
+        print "videoData is none! skipping this frame!"
+        continue
 
     print videoData
     print "Length of video data row from select statement: {}".format(len(videoData))
@@ -100,6 +90,16 @@ for curFrame in range(1,numFrames+1):
     landmarks = map(int, landmarks)
     landmarks = zip(landmarks[::2],landmarks[1::2])
     print "Landmarks:", landmarks
+
+    # CREATE IMG PATH
+    imgFileName = "{v}.{f}.png".format(v=videoId, f=curFrame)
+    imgPath = os.path.join(inputDir, imgFileName)
+    print imgPath
+
+    # LOAD IMAGE
+    bgrImg = cv2.imread(imgPath)
+    if bgrImg is None:
+        raise Exception("Unable to load image")
 
     # GET DELAUNAY TRIANGLES
     dims = bgrImg.shape
