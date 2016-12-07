@@ -91,9 +91,9 @@ for curFrame in range(1,numFrames+1):
     print "Length of video data row from select statement: {}".format(len(videoData))
 
     pupils = zip(videoData[9:13],videoData[9:13])
-    print pupils
+    print "Pupils:", pupils
     landmarks = zip(videoData[13:149],videoData[13:149])
-    print landmarks
+    print "Landmarks:", landmarks
 
     # GET DELAUNAY TRIANGLES
     dims = bgrImg.shape
@@ -101,7 +101,7 @@ for curFrame in range(1,numFrames+1):
     subdiv = cv2.Subdiv2D()
     subdiv.initDelaunay(rect)
     for landmark in landmarks:
-        print landmark
+        print "landmark type:",type(landmark)
         subdiv.insert(landmark)
     triangleList = subdiv.getTriangleList()
     print(triangleList)
