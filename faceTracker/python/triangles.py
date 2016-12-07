@@ -26,15 +26,10 @@ parser.add_argument("--dbUser", required=True)
 parser.add_argument("--dbPassword", required=True)
 args = vars(parser.parse_args())
 videoId = args['videoId']
-print videoId
 inputDir = args['inputDir']
-print inputDir
 dbName = args['dbName']
-print dbName
 dbUser = args['dbUser']
-print dbUser
 dbPassword = args['dbPassword']
-print dbPassword
 
 # CONNECT TO DB
 print "Connecting to DB..."
@@ -70,9 +65,10 @@ for curFrame in range(1,numFrames+1):
     # CREATE IMG PATH
     imgFileName = "{v}.{f}.png".format(v=videoId, f=curFrame)
     imgPath = os.path.join(inputDir, imgFileName)
+    print imgPath
 
     # LOAD IMAGE
-    bgrImg = cv2.imread(file)
+    bgrImg = cv2.imread(imgPath)
     if bgrImg is None:
         raise Exception("Unable to load image")
 
