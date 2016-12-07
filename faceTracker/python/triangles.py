@@ -42,6 +42,8 @@ except Exception as e:
 cur = conn.cursor()
 
 # GET METADATA
+selectString = "SELECT (num_frames,frame_width,frame_height) FROM video_metadata WHERE video_id={}".format(videoId)
+print "SELECT command for metadata: ", selectString
 try:
     cur.execute("SELECT (num_frames,frame_width,frame_height) FROM video_metadata WHERE video_id={}".format(videoId))
 except Exception as e:
