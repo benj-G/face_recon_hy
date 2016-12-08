@@ -127,7 +127,7 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     ss << " dbname = " << "'" << "pipedream" << "'";
     ss << " user = " << "'" << "piper" << "'";
     ss << " password = " << "'" << "letm3in" << "'";
-    dbConnectString = ss.str();
+    string dbConnectString = ss.str();
 
     PGconn *db_connection = PQconnectdb(dbConnectString.c_str());
     if (PQstatus(db_connection) != CONNECTION_OK)
