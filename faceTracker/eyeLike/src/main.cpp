@@ -122,6 +122,13 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     cout << "Begin pg connect code" << endl;
     PGresult *db_result;
 
+    stringstream ss;
+    ss << "host = " << "'" << "localhost" << "'";
+    ss << " dbname = " << "'" << "pipedream" << "'";
+    ss << " user = " << "'" << "piper" << "'";
+    ss << " password = " << "'" << "letm3in" << "'";
+    dbConnectString = ss.str();
+
     PGconn *db_connection = PQconnectdb(dbConnectString.c_str());
     if (PQstatus(db_connection) != CONNECTION_OK)
     {
@@ -131,13 +138,13 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     }
     cout << "connected to db!" << endl;
 
-    stringstream ss;
+    ss.str(""); ss.clear();
     ss << "UPDATE video_data SET LEFT_PUPIL_FT_LOC_X = " << leftPupil.x
     << "," << " LEFT_PUPIL_FT_LOC_Y  = " << leftPupil.y
     << "," << " RIGHT_PUPIL_FT_LOC_X  = " << rightPupil.x
     << "," << " RIGHT_PUPIL_FT_LOC_Y  = " << rightPupil.y;
 
-    PGresult *db_result = PQexec(db_connection, ss.str().c_str());
+    db_result = PQexec(db_connection, ss.str().c_str());
     if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
     {
         cout << PQresStatus(PQresultStatus(db_result)) << endl;
