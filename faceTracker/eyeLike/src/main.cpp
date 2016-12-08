@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "/usr/include/postgresql/libpq-fe.h"
-#include <stringstream>
+#include <sstream>
 
 using namespace std;
 
