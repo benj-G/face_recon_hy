@@ -138,12 +138,17 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     }
     cout << "connected to db!" << endl;
 
+    // TEMPORARY HARD CODED VIDEO ID AND FRAME NUM
+    int videoId = 1;
+    int frameNum = 1;
+
     ss.str(""); ss.clear();
     ss << "UPDATE video_data SET LEFT_PUPIL_FT_LOC_X = " << leftPupil.x
     << "," << " LEFT_PUPIL_FT_LOC_Y  = " << leftPupil.y
     << "," << " RIGHT_PUPIL_FT_LOC_X  = " << rightPupil.x
     << "," << " RIGHT_PUPIL_FT_LOC_Y  = " << rightPupil.y
-    << " WHERE video_id=17";
+    << " WHERE video_id=" << videoId
+    << " AND frame_num=" << frameNum;
 
     db_result = PQexec(db_connection, ss.str().c_str());
     if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
