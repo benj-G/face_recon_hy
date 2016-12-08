@@ -78,7 +78,7 @@ cv::Point unscalePoint(cv::Point p, cv::Rect origSize) {
         //EXECUTE SQL QUERY
         W.exec(sql);
         W.commit();
-        count << "Data inserted" << endl;
+        cout << "Data inserted" << endl;
         C.disconnect();
         
     } catch (const std::exception &e) {
