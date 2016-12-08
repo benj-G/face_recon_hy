@@ -7,13 +7,11 @@
 #include <iostream>
 #include <queue>
 #include <stdio.h>
-#include <pqxx/pqxx>
 
 #include "constants.h"
 #include "helpers.h"
 
 using namespace std;
-using namespace pqxx;
 
 // Pre-declarations
 cv::Mat floodKillEdges(cv::Mat &mat);
@@ -52,38 +50,6 @@ cv::Point unscalePoint(cv::Point p, cv::Rect origSize) {
   float ratio = (((float)kFastEyeWidth)/origSize.width);
   int x = round(p.x / ratio);
   int y = round(p.y / ratio);
-    
-    char *sql;
-    try {
-        connection C("dbname=pipedream user=postgres password=postgres \
-                     hostaddr=127.0.0.1 port=5432");
-        if (C.is_open()) {
-            cout << "Opened database successfully: " << C.dbname() << endl;
-        } else {
-            cout << "Can't open database" << endl;
-        }
-        
-        // CREATE SQL STATEMENT
-        sql = "CREATE TABLE BACKUPCOORDINATES(" \
-        "X INT NOT NULL," \
-        "Y INT NOT NULL;";
-        
-        // INSERT COORDINATES
-        sql = "INSERT INTO BACKUPCOORDINATES (X, Y)" \
-        "VALUES (:x, :y)";
-        
-        // CREATE A TRANSACTIONAL OBJECT
-        work W(C);
-        
-        //EXECUTE SQL QUERY
-        W.exec(sql);
-        W.commit();
-        cout << "Data inserted" << endl;
-        C.disconnect();
-        
-    } catch (const std::exception &e) {
-        cerr << e.what() << std::endl;
-    }
     
   return cv::Point(x,y);
 }
