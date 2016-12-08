@@ -142,7 +142,8 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
     ss << "UPDATE video_data SET LEFT_PUPIL_FT_LOC_X = " << leftPupil.x
     << "," << " LEFT_PUPIL_FT_LOC_Y  = " << leftPupil.y
     << "," << " RIGHT_PUPIL_FT_LOC_X  = " << rightPupil.x
-    << "," << " RIGHT_PUPIL_FT_LOC_Y  = " << rightPupil.y;
+    << "," << " RIGHT_PUPIL_FT_LOC_Y  = " << rightPupil.y
+    << " WHERE video_id=17";
 
     db_result = PQexec(db_connection, ss.str().c_str());
     if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
