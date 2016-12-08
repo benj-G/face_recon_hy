@@ -6,15 +6,14 @@
 #include <queue>
 #include <stdio.h>
 #include <math.h>
-#include <qxx/pqxx>
+#include "/usr/include/postgresql/libpq-fe.h"
+#include <sstream>
 
 using namespace std;
-using namepace pqxx;
 
 #include "constants.h"
 #include "findEyeCenter.h"
 #include "findEyeCorner.h"
-
 
 /** Constants **/
 int vid_id = 0;
@@ -24,7 +23,7 @@ void detectAndDisplay( cv::Mat frame );
 
 /** Global variables */
 //-- Note, either copy these two files from opencv/data/haarscascades to your current folder, or change these locations
-cv::String face_cascade_name = "../../../res/haarcascade_frontalface_alt.xml";
+cv::String face_cascade_name = "./res/haarcascade_frontalface_alt.xml";
 cv::CascadeClassifier face_cascade;
 std::string main_window_name = "Capture - Face detection";
 std::string face_window_name = "Capture - Face";
@@ -119,76 +118,50 @@ void findEyes(cv::Mat frame_gray, cv::Rect face) {
   //-- Find Eye Centers
   cv::Point leftPupil = findEyeCenter(faceROI,leftEyeRegion,"Left Eye");///left eye center
   cv::Point rightPupil = findEyeCenter(faceROI,rightEyeRegion,"Right Eye");//right eye center
-    
-    try {
-        char *sql;
-        connection C("dbname=pipedream user=postgres password=postgres \
-                     hostaddr=127.0.0.1 port=5432");
-        if (C.is_open()) {
-            cout << "Database connected: " << C.dbname() << endl;
-        } else {
-            cout << "Can't open database" << endl;
-        }
-        
-        // CREATE TRANSACTIONAL OBJECT
-        work W(C);
-    
-        // UPDATE VIDEO_DATA TABLE
-        //sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :leftPupil.x where VIDEO_ID = :vid_id"
-        sprintf("UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", leftPupil.x, vid_id);
-        W.commit();
-        //sql = "UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :leftPupil.y where VIDEO_ID = :vid_id"
-        sprintf("UPDATE VIDEO_DATA set LEFT_PUPIL_FT_LOC_Y = :%d where VIDEO_ID = :%i", leftPupil.y, vid_id);
-        W.commit();
-        //sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :rightPupil.x where VIDEO_ID = :vid_id"
-        sprintf("UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", rightPupil.x, vid_id);
-        W.commit();
-        //sql = "UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_Y = :rightPupil.y where VIDEO_ID = :vid_id"
-        sprintf("UPDATE VIDEO_DATA set RIGHT_PUPIL_FT_LOC_X = :%d where VIDEO_ID = :%i", rightPupil.y, vid_id);
-        W.commit();
-        
-        // EXECUTE SQL QUERY
-        //W.exec(sql);
-       // W.commit();
-        cout << "Data updated." << endl;
-        
-        C.disconnect();
 
-    } catch(const std::exception &e) {
-        cerr << e.what() << std::endl;
+    cout << "Begin pg connect code" << endl;
+    PGresult *db_result;
+
+    stringstream ss;
+    ss << "host = " << "'" << "localhost" << "'";
+    ss << " dbname = " << "'" << "pipedream" << "'";
+    ss << " user = " << "'" << "piper" << "'";
+    ss << " password = " << "'" << "letm3in" << "'";
+    string dbConnectString = ss.str();
+
+    PGconn *db_connection = PQconnectdb(dbConnectString.c_str());
+    if (PQstatus(db_connection) != CONNECTION_OK)
+    {
+        printf("<P>[1]System error. Please contact customer support.<BR>");
+        PQfinish(db_connection);
+        exit(EXIT_FAILURE);
     }
-    /*
-    char *sql;
-    try {
-        connection C("dbname=pipedream user=postgres password=postgres \hostaddr=127.0.0.1 port=5432");
-        if (C.is_open()) {
-            cout << "Opened database successfully: " << C.dbname() <<endl;
-        } else {
-            cout << "Can't open database" << endl;
-        }
-        
-        // Create SQL statement
-        sql = "CREATE TABLE COORDINATES(" \
-        "RIGHTX INT NOT NULL," \
-        "RIGHTY INT NOT NULL," \
-        "LEFTX INT NOT NULL," \
-        "LEFTY INT NOT NULL);";
-        
-        
-        sql = "EXEC SQL INSERT INTO COORDINATES VALUES(:rightPupil.x, :rightPupil.y, :leftPupil.x, :leftPupil.y)";
-        
-        // Create a transactional object
-        work W(C);
-        
-        W.exec(sql);
-        W.commit();
-        cout << "Data points stored." << endl;
-        C.disconnect();
-        
-    } catch (const std::exception &e) {
-        cerr << e.what() << std::endl;
+    cout << "connected to db!" << endl;
+
+    // TEMPORARY HARD CODED VIDEO ID AND FRAME NUM
+    int videoId = 1;
+    int frameNum = 1;
+
+    ss.str(""); ss.clear();
+    ss << "UPDATE video_data SET LEFT_PUPIL_FT_LOC_X = " << leftPupil.x
+    << "," << " LEFT_PUPIL_FT_LOC_Y  = " << leftPupil.y
+    << "," << " RIGHT_PUPIL_FT_LOC_X  = " << rightPupil.x
+    << "," << " RIGHT_PUPIL_FT_LOC_Y  = " << rightPupil.y
+    << " WHERE video_id=" << videoId
+    << " AND frame_num=" << frameNum;
+
+    db_result = PQexec(db_connection, ss.str().c_str());
+    if(PQresultStatus(db_result) != PGRES_COMMAND_OK)
+    {
+        cout << PQresStatus(PQresultStatus(db_result)) << endl;
+        cout << PQresultErrorMessage(db_result);
+        printf("<p>[pupil update error]System error. Please contact customer service.<DB>");
+        exit(EXIT_FAILURE);
     }
-    */
+    PQclear(db_result);
+    PQfinish(db_connection);
+    cout << "Data updated." << endl;
+
   // get corner regions
   cv::Rect leftRightCornerRegion(leftEyeRegion);
   leftRightCornerRegion.width -= leftPupil.x;

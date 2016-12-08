@@ -317,10 +317,12 @@ int processVideo(long in_videoID)
             printf("<p>System error. Please contact customer support.<BR>");
             break;
           }
-          int numerator = (int)strtol(token, NULL, 10);
+          char* tmp;
+          float numerator = strtof(token, &tmp);
           token = strtok(NULL, "/");
-          int denominator = (int)strtol(token, NULL, 10);
+          float denominator = strtof(token, &tmp);
           fps = numerator / denominator;
+          printf("Frames Per Seoncd: %f", fps);
           break;
         case 4 :
           numFrames = (int)strtol(entry, NULL, 10);
